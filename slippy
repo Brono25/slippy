@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+
+
+
+import sys
+import slippy_utility as util
+import slippy_quit as sq
+
+
+
+
+def determineMode(input_cmd):
+
+	trailing_letter = input_cmd.rstrip()[-1]
+	
+	if trailing_letter == 'q':
+		return 'mode_quit'
+
+	if trailing_letter == 'p':
+		return 'mode_print'
+
+	if trailing_letter == 'd':
+		return 'mode_delete'
+
+	util.printInvalidCommand()
+
+
+
+
+if len(sys.argv) == 1:
+	print(f'usage: slippy [-i] [-n] [-f <script-file> | <sed-command>] [<files>...]', file=sys.stderr)
+	sys.exit(1)
+
+
+
+input_cmd = sys.argv[1]
+mode = determineMode(sys.argv[1])
+
+
+
+
+
+
+
+
+
+
+
+
+if mode == 'mode_quit':
+	sq.performQuit(input_cmd)

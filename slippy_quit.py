@@ -91,7 +91,6 @@ def performQuit(input_cmd):
 
 
 	
-
 	line_num = 1
 	for line in sys.stdin:
 

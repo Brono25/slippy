@@ -1,52 +1,189 @@
 #!/usr/bin/env python3
 
 
-
-import sys
+import slippy_debugging_tools as debug
+import sys, re
 import slippy_utility as util
-import slippy_quit as sq
-import slippy_print as sp
 import slippy_parse_input as parse
+import getopt
+
+
+class Process:
+    def __init__(self):
+        self.curr_operation   = None
+        self.curr_line        = None
+        self.curr_line_num    = None
+        self.option_n		  = False
+        self.option_i		  = False
+        self.regex_found_flag = False
+        
+
+
+#------------------------------------------
+#                FUNCTIONS
+#------------------------------------------
+
+def performQuit(addr_info, process):
+
+	number   = addr_info.single_num
+	regex    = addr_info.single_regexp
+	line     = process.curr_line
+	line_num = process.curr_line_num
+
+	if number != None:
+
+		if line_num == number:
+			sys.exit(0)
+
+	elif regex != None:
+		if re.search(regex , line):
+			sys.exit(0)
 
 
 
-def determineMode(input_cmd):
+def performPrint(addr_info, process):
 
-	trailing_letter = input_cmd.rstrip()[-1]
+	single_num   = addr_info.single_num
+	single_regex = addr_info.single_regexp
+	start_num    = addr_info.start_num
+	start_regex  = addr_info.start_regexp
+	end_num      = addr_info.end_num
+	end_regex    = addr_info.end_regexp
+
+
+	line       = process.curr_line
+	line_num   = process.curr_line_num
+	regex_flag = process.regex_found_flag
+
+	if addr_info.is_address_found == False:
+		print(line, end='')
+
+	elif single_num != None:
+
+		if single_num == line_num:
+			print(line, end='')
+
+	elif single_regex != None:
+
+		if re.search(single_regex, line):
+			print(line, end='')
+
+	elif start_num != None and end_num != None:
+
+		if start_num <= line_num <= end_num:
+			print(line, end='')
+
+	elif start_num != None and end_regex != None:
+
+		if start_num <= line_num and regex_flag == False :
+			print(line, end='')
+			if re.search(end_regex, line):
+				regex_flag = True
+				
+	elif start_regex != None and end_num != None:
+
+		if re.search(start_regex, line) and regex_flag == False:
+			regex_flag = True
+
+		if regex_flag == True and end_num >= line_num:
+			print(line, end='')
 	
-	if trailing_letter == 'q':
-		return 'mode_quit'
 
-	if trailing_letter == 'p':
-		return 'mode_print'
-
-	if trailing_letter == 'd':
-		return 'mode_delete'
-
-	util.printInvalidCommand()
+	process.regex_found_flag = regex_flag
+	return process
 
 
 
 
-if len(sys.argv) == 1:
+
+
+
+
+
+
+
+#------------------------------------------
+#                  MAIN
+#------------------------------------------
+
+
+
+
+argv = sys.argv[1:]
+
+try:
+	opts, args = getopt.getopt(argv, "nif")
+
+except getopt.GetoptError:
 	print(f'usage: slippy [-i] [-n] [-f <script-file> | <sed-command>] [<files>...]', file=sys.stderr)
 	sys.exit(1)
 
-
-
-input_cmd = sys.argv[1]
-# mode = determineMode(sys.argv[1])
-
+if len(args) != 1:
+	util.printError()
 
 
 
-# if mode == 'mode_quit':
-# 	sq.performQuit(input_cmd)
-# elif mode == 'mode_print':
-# 	sp.performPrint(input_cmd)
+input_cmd = args[0]
+process   = Process() #holds info of the current command executions
+
+
+#check options
+for opt, _ in opts:
+	if opt == '-i':
+		process.option_i = True
+	if opt == '-n':
+		process.option_n = True
+
+
+addr_info = parse.Address()
+addr_info = parse.getAddress(input_cmd)
+cmd_info  = parse.Command()
+cmd_info  = parse.getCommand(input_cmd, addr_info.address_string)
+
+
+
+
+line_num = 1
+while True:
+
+	line = sys.stdin.readline()
+	if line == '':
+		break
+
+	#option -n toggles printing
+	if process.option_n == False:
+		print(line, end='')
+
+
+
+
+	#----------update process----------
+	process.curr_line = line
+	process.curr_line_num = line_num
+
+
+	#----------execute commands----------
+	if cmd_info.operation == 'q':
+		performQuit(addr_info, process)
+
+	elif cmd_info.operation == 'p':
+		process = performPrint(addr_info, process)
+	
+
+	line_num += 1
 
 
 
 
 
-parse.getAddress(input_cmd)
+
+
+
+
+
+
+
+
+
+
+

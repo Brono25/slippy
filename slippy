@@ -10,87 +10,86 @@ import getopt
 
 class Process:
     def __init__(self):
-        self.curr_operation   = None
         self.curr_line        = None
         self.curr_line_num    = None
-        self.option_n		  = False
-        self.option_i		  = False
         self.regex_found_flag = False
-        
+
+
 
 
 #------------------------------------------
 #                FUNCTIONS
 #------------------------------------------
 
-def performQuit(addr_info, process):
+def performQuit(cmd_info, process):
+    """
+    Exits program at provided address
+    """
+    number   = cmd_info.single_num
+    regex    = cmd_info.single_regexp
+    line     = process.curr_line
+    line_num = process.curr_line_num
 
-	number   = addr_info.single_num
-	regex    = addr_info.single_regexp
-	line     = process.curr_line
-	line_num = process.curr_line_num
+    if number != None:
 
-	if number != None:
+        if line_num == number:
+            sys.exit(0)
 
-		if line_num == number:
-			sys.exit(0)
-
-	elif regex != None:
-		if re.search(regex , line):
-			sys.exit(0)
-
-
-
-def performPrint(addr_info, process):
-
-	single_num   = addr_info.single_num
-	single_regex = addr_info.single_regexp
-	start_num    = addr_info.start_num
-	start_regex  = addr_info.start_regexp
-	end_num      = addr_info.end_num
-	end_regex    = addr_info.end_regexp
+    elif regex != None:
+        if re.search(regex , line):
+            sys.exit(0)
 
 
-	line       = process.curr_line
-	line_num   = process.curr_line_num
-	regex_flag = process.regex_found_flag
 
-	if addr_info.is_address_found == False:
-		print(line, end='')
+def performPrint(cmd_info, process):
+    """
+    Prints the current line if it falls within the bounds
+    of an address.
+    """
 
-	elif single_num != None:
+    single_num   = cmd_info.single_num
+    single_regex = cmd_info.single_regexp
+    start_num    = cmd_info.start_num
+    start_regex  = cmd_info.start_regexp
+    end_num      = cmd_info.end_num
+    end_regex    = cmd_info.end_regexp
 
-		if single_num == line_num:
-			print(line, end='')
 
-	elif single_regex != None:
+    line       = process.curr_line
+    line_num   = process.curr_line_num
+    regex_flag = process.regex_found_flag
 
-		if re.search(single_regex, line):
-			print(line, end='')
+    if cmd_info.is_address_found == False:
+        print(line, end='')
 
-	elif start_num != None and end_num != None:
+    elif single_num != None:
+        if single_num == line_num:
+            print(line, end='')
 
-		if start_num <= line_num <= end_num:
-			print(line, end='')
+    elif single_regex != None:
+        if re.search(single_regex, line):
+            print(line, end='')
 
-	elif start_num != None and end_regex != None:
+    elif start_num != None and end_num != None:
+        if start_num <= line_num <= end_num:
+            print(line, end='')
 
-		if start_num <= line_num and regex_flag == False :
-			print(line, end='')
-			if re.search(end_regex, line):
-				regex_flag = True
-				
-	elif start_regex != None and end_num != None:
+    elif start_num != None and end_regex != None:
+        if start_num <= line_num and regex_flag == False :
+            print(line, end='')
+            if re.search(end_regex, line):
+                regex_flag = True
+                
+    elif start_regex != None and end_num != None:
+        if re.search(start_regex, line) and regex_flag == False:
+            regex_flag = True
 
-		if re.search(start_regex, line) and regex_flag == False:
-			regex_flag = True
+        if regex_flag == True and end_num >= line_num:
+            print(line, end='')
+    
 
-		if regex_flag == True and end_num >= line_num:
-			print(line, end='')
-	
-
-	process.regex_found_flag = regex_flag
-	return process
+    process.regex_found_flag = regex_flag
+    return process
 
 
 
@@ -112,65 +111,59 @@ def performPrint(addr_info, process):
 argv = sys.argv[1:]
 
 try:
-	opts, args = getopt.getopt(argv, "nif")
+    opts, args = getopt.getopt(argv, "nif")
 
 except getopt.GetoptError:
-	print(f'usage: slippy [-i] [-n] [-f <script-file> | <sed-command>] [<files>...]', file=sys.stderr)
-	sys.exit(1)
+    print(f'usage: slippy [-i] [-n] [-f <script-file> | <sed-command>] [<files>...]', file=sys.stderr)
+    sys.exit(1)
 
 if len(args) != 1:
-	util.printError()
-
+    util.printError()
 
 
 input_cmd = args[0]
 process   = Process() #holds info of the current command executions
+cmd_info = parse.parseInput(input_cmd)
 
+option_n = False
+option_i = False
 
 #check options
 for opt, _ in opts:
-	if opt == '-i':
-		process.option_i = True
-	if opt == '-n':
-		process.option_n = True
-
-
-addr_info = parse.Address()
-addr_info = parse.getAddress(input_cmd)
-cmd_info  = parse.Command()
-cmd_info  = parse.getCommand(input_cmd, addr_info.address_string)
-
-
+    if opt == '-i':
+        option_i = True
+    if opt == '-n':
+        option_n = True
 
 
 line_num = 1
 while True:
 
-	line = sys.stdin.readline()
-	if line == '':
-		break
+    line = sys.stdin.readline()
+    if line == '':
+        break
 
-	#option -n toggles printing
-	if process.option_n == False:
-		print(line, end='')
-
-
+    #option -n toggles printing
+    if option_n == False:
+        print(line, end='')
 
 
-	#----------update process----------
-	process.curr_line = line
-	process.curr_line_num = line_num
 
 
-	#----------execute commands----------
-	if cmd_info.operation == 'q':
-		performQuit(addr_info, process)
+    #----------update process----------
+    process.curr_line = line
+    process.curr_line_num = line_num
 
-	elif cmd_info.operation == 'p':
-		process = performPrint(addr_info, process)
-	
 
-	line_num += 1
+    #----------execute commands----------
+    if cmd_info.operation == 'q':
+        performQuit(cmd_info, process)
+
+    elif cmd_info.operation == 'p':
+        process = performPrint(cmd_info, process)
+    
+
+    line_num += 1
 
 
 

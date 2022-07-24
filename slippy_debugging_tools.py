@@ -19,3 +19,13 @@ def printCommand(cmd):
     print(r'Full string:',cmd.full_address)
 
 
+def printProcess(p):
+
+    print('')
+    print('curr line:', p.curr_line)
+    print('curr line num:', p.curr_line_num)
+    print('output line:', p.output_line)
+    print('flag:', p.regex_found_flag)
+    print('')
+   
+

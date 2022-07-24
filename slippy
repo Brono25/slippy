@@ -12,6 +12,7 @@ class Process:
     def __init__(self):
         self.curr_line        = None
         self.curr_line_num    = None
+        self.output_line      = None
         self.regex_found_flag = False
 
 
@@ -29,7 +30,7 @@ def performQuit(cmd_info, process):
     regex    = cmd_info.single_regexp
     line     = process.curr_line
     line_num = process.curr_line_num
-
+    process.output_line = line
     if number != None:
 
         if line_num == number:
@@ -38,6 +39,8 @@ def performQuit(cmd_info, process):
     elif regex != None:
         if re.search(regex , line):
             sys.exit(0)
+
+    return process
 
 
 
@@ -60,40 +63,47 @@ def performPrint(cmd_info, process):
     regex_flag = process.regex_found_flag
 
     if cmd_info.is_address_found == False:
-        print(line, end='')
+        process.output_line = line
 
     elif single_num != None:
         if single_num == line_num:
-            print(line, end='')
+            process.output_line = line
 
     elif single_regex != None:
         if re.search(single_regex, line):
-            print(line, end='')
+            process.output_line = line
 
     elif start_num != None and end_num != None:
         if start_num <= line_num <= end_num:
-            print(line, end='')
+            process.output_line = line
 
     elif start_num != None and end_regex != None:
         if start_num <= line_num and regex_flag == False :
-            print(line, end='')
+            process.output_line = line
             if re.search(end_regex, line):
                 regex_flag = True
-                
+        else:
+            process.output_line = ''
+
     elif start_regex != None and end_num != None:
         if re.search(start_regex, line) and regex_flag == False:
             regex_flag = True
 
         if regex_flag == True and end_num >= line_num:
-            print(line, end='')
-    
+            process.output_line = line
+        else:
+            process.output_line = ''
 
     process.regex_found_flag = regex_flag
+
+
+
+
     return process
 
 
 
-
+# def performDelete(cmd_info, process):
 
 
 
@@ -123,7 +133,7 @@ if len(args) != 1:
 
 input_cmd = args[0]
 process   = Process() #holds info of the current command executions
-cmd_info = parse.parseInput(input_cmd)
+cmd_info  = parse.parseInput(input_cmd)
 
 option_n = False
 option_i = False
@@ -143,12 +153,7 @@ while True:
     if line == '':
         break
 
-    #option -n toggles printing
-    if option_n == False:
-        print(line, end='')
-
-
-
+    process.output_line = ''
 
     #----------update process----------
     process.curr_line = line
@@ -157,11 +162,22 @@ while True:
 
     #----------execute commands----------
     if cmd_info.operation == 'q':
-        performQuit(cmd_info, process)
+        process = performQuit(cmd_info, process)
+        print(process.output_line, end='')
+
 
     elif cmd_info.operation == 'p':
         process = performPrint(cmd_info, process)
+        print(process.output_line, end='')
+
+    elif cmd_info.operation == 'd':
+        process = performDelete(cmd_info, process)
     
+    # if option_n == False:
+    #     print(process.curr_line, end='')
+    
+
+    #debug.printProcess(process)
 
     line_num += 1
 

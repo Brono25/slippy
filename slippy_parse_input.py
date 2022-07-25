@@ -8,8 +8,11 @@ import slippy_utility as util
 
 class Command:
     def __init__(self):
+
         self.operation        = None
-        #addresses
+        self.regex_found_flag = False  
+        
+        #address info
         self.is_address_found = False
         self.single_num       = None
         self.single_regexp    = None
@@ -18,7 +21,7 @@ class Command:
         self.end_num          = None
         self.end_regexp       = None
         self.full_address     = None
-        #subs
+        #subs info
         self.s_replace        = None
         self.s_substitute     = None
         self.s_global_flag    = False
@@ -80,8 +83,6 @@ def getAddressInfo(cmd, cmd_info):
     else:
         util.printInvalidCommand()
 
-
-    
 
     return cmd_info
 

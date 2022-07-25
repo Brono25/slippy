@@ -8,7 +8,7 @@ def printCommand(cmd):
 
     print('operation:', cmd.operation)
     print('replace:', cmd.s_replace)
-    print('sub:', cmd.s_substitute)
+    print('sub:', cmd.s_pattern)
     print('flag:', cmd.s_global_flag)
     print(r'single num:',cmd.single_num)
     print(r'single regex:',cmd.single_regexp)

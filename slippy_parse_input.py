@@ -9,8 +9,9 @@ import slippy_utility as util
 class Command:
     def __init__(self):
 
-        self.operation        = None
-        self.regex_found_flag = False  
+        self.operation        = None #q,p,d,s
+        self.regex_flag       = False
+        self.begin_flag       = False
         
         #address info
         self.is_address_found = False
@@ -22,9 +23,9 @@ class Command:
         self.end_regexp       = None
         self.full_address     = None
         #subs info
+        self.s_pattern        = None
         self.s_replace        = None
-        self.s_substitute     = None
-        self.s_global_flag    = False
+        self.s_global_flag    = 1
 
 
 
@@ -107,18 +108,21 @@ def getCommandInfo(cmd, cmd_info):
     #parse substitute operation
     if cmd_info.operation == 's':
 
-        d = cmd[1] #delimeter is first character after 's'
-        cmd_info.delimiter = d
+        try:
+            d = cmd[1] #delimeter is first character after 's'
+            cmd_info.delimiter = d
+        except IndexError:
+            util.printInvalidCommand()
 
-        s_regex = '^s' + d + r'(.*)' + d + r'(.*)' + d + r'(.*)$'
+        s_pattern = '^s' + d + r'(.+)' + d + r'(.*)' + d + r'(.*)$'
 
-        if result := re.search(s_regex, cmd):
+        if result := re.search(s_pattern, cmd):
 
-            cmd_info.s_replace = result.group(1)
-            cmd_info.s_substitute = result.group(2)
+            cmd_info.s_pattern = result.group(1)
+            cmd_info.s_replace = result.group(2)
 
-            if result.group(3) == 'g':
-                cmd_info.s_global_flag = True
+            if result.group(3).strip() == 'g':
+                cmd_info.s_global_flag = 0
 
             elif result.group(3) == '':
                 pass

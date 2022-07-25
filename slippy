@@ -31,11 +31,11 @@ def performQuit(cmd_info, process):
     line     = process.curr_line
     line_num = process.curr_line_num
     
-    if number != None:
+    if number:
         if line_num == number:
             return True
 
-    elif regex != None:
+    elif regex:
         if re.search(regex , line):
             return True
 
@@ -58,68 +58,65 @@ def performPrint(cmd_info, process):
 
     line         = process.curr_line
     line_num     = process.curr_line_num
-    regex_flag   = cmd_info.regex_found_flag
+
 
     #---------'p'---------
-    if cmd_info.is_address_found == False:
+    if not cmd_info.is_address_found:
         process.output_line = line
 
     #---------'np'---------
-    elif single_num != None:
+    elif single_num:
         if single_num == line_num:
             process.output_line = line
         else:
             process.output_line = None
 
     #---------'/regx/p'---------
-    elif single_regex != None:
+    elif single_regex:
         if re.search(single_regex, line):
             process.output_line = line
         else:
             process.output_line = None
 
     #---------'n1,n2p'---------
-    elif start_num != None and end_num != None:
+    elif start_num and end_num:
         if start_num <= line_num <= end_num:
             process.output_line = line
         else:
             process.output_line = None
 
     #---------'n,/regx/p'---------
-    elif start_num != None and end_regex != None:
-        if start_num <= line_num and regex_flag == False :
+    elif start_num and end_regex:
+        if start_num <= line_num and not cmd_info.regex_flag:
             process.output_line = line
             if re.search(end_regex, line):
-                regex_flag = True
+                cmd_info.regex_flag = True
         else:
             process.output_line = None
 
     #---------'/regx/,np'---------
-    elif start_regex != None and end_num != None:
-        if re.search(start_regex, line) and regex_flag == False:
-            regex_flag = True
+    elif start_regex and end_num:
+        if re.search(start_regex, line) and not cmd_info.regex_flag:
+            cmd_info.regex_flag = True
 
-        if regex_flag == True and end_num >= line_num:
+        if cmd_info.regex_flag and end_num >= line_num:
             process.output_line = line
         else:
             process.output_line = None
 
     #---------'/regx1/,/regx2/p'---------
-    elif start_regex != None and end_regex != None:
-        if re.search(start_regex, line) and regex_flag == False:
-            regex_flag = True
+    elif start_regex and end_regex:
+        if re.search(start_regex, line) and not cmd_info.regex_flag:
+            cmd_info.regex_flag = True
             
-        if regex_flag == True:
+        if cmd_info.regex_flag:
             process.output_line = line
         else:
             process.output_line = None
 
-        if  result := re.search(end_regex, line) and regex_flag == True:
-            regex_flag = False
+        if  result := re.search(end_regex, line) and cmd_info.regex_flag:
+            cmd_info.regex_flag = False
 
-       
-
-    cmd_info.regex_found_flag = regex_flag
 
     return cmd_info, process
 
@@ -141,68 +138,162 @@ def performDelete(cmd_info, process):
 
     line         = process.curr_line
     line_num     = process.curr_line_num
-    regex_flag   = cmd_info.regex_found_flag
 
     #---------'d'---------
-    if cmd_info.is_address_found == False:
+    if not cmd_info.is_address_found:
         process.output_line = None
 
     #---------'nd'---------
-    elif single_num != None:
+    elif single_num:
         if single_num == line_num:
             process.output_line = None
         else:
             process.output_line = line
 
     #---------'/regx/d'---------
-    elif single_regex != None:
+    elif single_regex:
         if re.search(single_regex, line):
             process.output_line = None
         else:
             process.output_line = line
 
     #---------'n1,n2d'---------
-    elif start_num != None and end_num != None:
+    elif start_num and end_num:
         if start_num <= line_num <= end_num:
             process.output_line = None
         else:
             process.output_line = line
 
     #---------'n,/regx/d'---------
-    elif start_num != None and end_regex != None:
-        if start_num <= line_num and regex_flag == False :
+    elif start_num and end_regex:
+        if start_num <= line_num and not cmd_info.regex_flag:
             process.output_line = None
             if re.search(end_regex, line):
-                regex_flag = True
+                cmd_info.regex_flag = True
         else:
             process.output_line = line
 
     #---------'/regx/,nd'---------
-    elif start_regex != None and end_num != None:
-        if re.search(start_regex, line) and regex_flag == False:
-            regex_flag = True
+    elif start_regex and end_num:
+        if re.search(start_regex, line) and not cmd_info.regex_flag:
+            cmd_info.regex_flag = True
 
-        if regex_flag == True and end_num >= line_num:
+        if cmd_info.regex_flag and end_num >= line_num:
             process.output_line = None
         else:
             process.output_line = line
 
-    #---------'/regx1/,/regx2/p'---------
-    elif start_regex != None and end_regex != None:
-        if re.search(start_regex, line) and regex_flag == False:
-            regex_flag = True
+    #---------'/regx1/,/regx2/d'---------
+    elif start_regex and end_regex:
+        if re.search(start_regex, line) and not cmd_info.regex_flag:
+            cmd_info.regex_flag = True
             
-        if regex_flag == True:
+        if cmd_info.regex_flag:
             process.output_line = None
         else:
             process.output_line = line
 
-        if  result := re.search(end_regex, line) and regex_flag == True:
-            regex_flag = False
+        if  result := re.search(end_regex, line) and cmd_info.regex_flag:
+            cmd_info.regex_flag = False
+
+
+    return cmd_info, process
+
+
+
+
+
+def performSubstitute(cmd_info, process):
+    """
+    Prints the current line if it falls within the bounds
+    of an address.
+    """
+
+    single_num   = cmd_info.single_num
+    single_regex = cmd_info.single_regexp
+    start_num    = cmd_info.start_num
+    start_regex  = cmd_info.start_regexp
+    end_num      = cmd_info.end_num
+    end_regex    = cmd_info.end_regexp
+    g_flag       = cmd_info.s_global_flag
+
+    line         = process.curr_line
+    line_num     = process.curr_line_num
+    
+
+    
+    #---------'s/a/b/'---------
+    if not cmd_info.is_address_found:
+
+        process.output_line = re.sub(cmd_info.s_pattern, cmd_info.s_replace, line, g_flag)
+
+    #---------'n s/a/b/'---------
+    elif single_num:
+        if single_num == line_num:
+            process.output_line = re.sub(cmd_info.s_pattern, cmd_info.s_replace, line, g_flag)
+        else:
+            process.output_line = line
+
+    #---------'/regx/s/a/b/'---------
+    elif single_regex:
+        if re.search(single_regex, line):
+            process.output_line = re.sub(cmd_info.s_pattern, cmd_info.s_replace, line, g_flag)
+        else:
+            process.output_line = line
+
+    #---------'n1,n2 s/a/b/'---------
+    elif start_num and end_num:
+        if start_num <= line_num <= end_num:
+            process.output_line = re.sub(cmd_info.s_pattern, cmd_info.s_replace, line, g_flag)
+        else:
+            process.output_line = line
+
+    #---------'n,/regx/s/a/b/'---------
+    elif start_num and end_regex:
+
+        #Only start looking for ending regex the next iteration after begin starts
+        end = bool(re.search(end_regex, line)) if cmd_info.begin_flag else False
+        begin = bool(start_num <= line_num)
+        cmd_info.begin_flag = True  if begin else False
+               
+
+        if begin and not cmd_info.regex_flag:
+            process.output_line = re.sub(cmd_info.s_pattern, cmd_info.s_replace, line, g_flag)
+        else:
+            process.output_line = line
+
+        if end:
+            cmd_info.regex_flag = True
+
+
+    #---------'/regx/,n s/a/b/'---------
+    elif start_regex != None and end_num != None:
+
+        
+        if re.search(start_regex, line) and cmd_info.regex_flag == False:
+            cmd_info.regex_flag = True
+
+        if cmd_info.regex_flag == True and end_num >= line_num:
+            process.output_line = None
+        else:
+            process.output_line = line
+
+    # #---------'/regx1/,/regx2/d'---------
+    # elif start_regex != None and end_regex != None:
+    #     if re.search(start_regex, line) and cmd_info.regex_flag == False:
+    #         cmd_info.regex_flag = True
+            
+    #     if cmd_info.regex_flag == True:
+    #         process.output_line = None
+    #     else:
+    #         process.output_line = line
+
+    #     if  result := re.search(end_regex, line) and cmd_info.regex_flag == True:
+    #         cmd_info.regex_flag = False
 
        
 
-    cmd_info.regex_found_flag = regex_flag
+    # cmd_info.regex_flag = cmd_info.regex_flag
 
     return cmd_info, process
 
@@ -282,9 +373,15 @@ while True:
         cmd_info, process = performDelete(cmd_info, process)
         if process.output_line != None and option_n != True:
             print(process.output_line, end='')
-        
+    
 
-       
+     #----------Execute Substitute----------
+    elif cmd_info.operation == 's':
+        cmd_info, process = performSubstitute(cmd_info, process)
+        
+        if process.output_line != None and option_n != True:
+            print(process.output_line, end='')
+        
 
 
 

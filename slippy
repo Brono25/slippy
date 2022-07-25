@@ -30,17 +30,16 @@ def performQuit(cmd_info, process):
     regex    = cmd_info.single_regexp
     line     = process.curr_line
     line_num = process.curr_line_num
-    process.output_line = line
+    
     if number != None:
-
         if line_num == number:
-            sys.exit(0)
+            return True
 
     elif regex != None:
         if re.search(regex , line):
-            sys.exit(0)
+            return True
 
-    return process
+    return False
 
 
 
@@ -57,34 +56,45 @@ def performPrint(cmd_info, process):
     end_num      = cmd_info.end_num
     end_regex    = cmd_info.end_regexp
 
+    line         = process.curr_line
+    line_num     = process.curr_line_num
+    regex_flag   = process.regex_found_flag
 
-    line       = process.curr_line
-    line_num   = process.curr_line_num
-    regex_flag = process.regex_found_flag
-
+    #---------'p'---------
     if cmd_info.is_address_found == False:
         process.output_line = line
 
+    #---------'np'---------
     elif single_num != None:
         if single_num == line_num:
             process.output_line = line
+        else:
+            process.output_line = None
 
+    #---------'/regx/p'---------
     elif single_regex != None:
         if re.search(single_regex, line):
             process.output_line = line
+        else:
+            process.output_line = None
 
+    #---------'n1,n2p'---------
     elif start_num != None and end_num != None:
         if start_num <= line_num <= end_num:
             process.output_line = line
+        else:
+            process.output_line = None
 
+    #---------'n,/regx/p'---------
     elif start_num != None and end_regex != None:
         if start_num <= line_num and regex_flag == False :
             process.output_line = line
             if re.search(end_regex, line):
                 regex_flag = True
         else:
-            process.output_line = ''
+            process.output_line = None
 
+    #---------'/regx/,np'---------
     elif start_regex != None and end_num != None:
         if re.search(start_regex, line) and regex_flag == False:
             regex_flag = True
@@ -92,12 +102,24 @@ def performPrint(cmd_info, process):
         if regex_flag == True and end_num >= line_num:
             process.output_line = line
         else:
-            process.output_line = ''
+            process.output_line = None
+
+    #---------'/regx1/,/regx2/p'---------
+    elif start_regex != None and end_regex != None:
+        if re.search(start_regex, line) and regex_flag == False:
+            regex_flag = True
+            
+        if regex_flag == True:
+            process.output_line = line
+        else:
+            process.output_line = None
+
+        if  result := re.search(end_regex, line) and regex_flag == True:
+            regex_flag = False
+
+       
 
     process.regex_found_flag = regex_flag
-
-
-
 
     return process
 
@@ -153,22 +175,29 @@ while True:
     if line == '':
         break
 
-    process.output_line = ''
-
     #----------update process----------
     process.curr_line = line
     process.curr_line_num = line_num
 
 
-    #----------execute commands----------
+    #----------Execute Quit----------
     if cmd_info.operation == 'q':
-        process = performQuit(cmd_info, process)
+        process.output_line = process.curr_line
         print(process.output_line, end='')
+        if performQuit(cmd_info, process):
+            sys.exit(0)
 
-
+    #----------Execute Print----------
     elif cmd_info.operation == 'p':
+        process.output_line = process.curr_line
+
+        if option_n == False:
+            print(process.output_line, end='')
+
         process = performPrint(cmd_info, process)
-        print(process.output_line, end='')
+
+        if process.output_line != None:
+            print(process.output_line, end='')
 
     elif cmd_info.operation == 'd':
         process = performDelete(cmd_info, process)

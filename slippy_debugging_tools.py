@@ -17,6 +17,7 @@ def printCommand(cmd):
     print(r'end num',cmd.end_num)
     print(r'end regex',cmd.end_regexp)
     print(r'Full string:',cmd.full_address)
+    print(r'address found:',cmd.is_address_found)
 
 
 def printProcess(p):

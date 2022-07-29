@@ -29,6 +29,27 @@ class Command:
 
 
 
+def isValidRegex(pattern, d =r'/'):
+    """
+    Checks if a regex pattern is valid. 
+    Slippy regex patterns cannot have un-escaped delimeters.
+    """
+
+    unescaped_del_pattern = str(r'[^\\]' + '\\' +  d + '|^\\' + d)
+
+    #Check for un-escaped delimeters
+    if re.search(unescaped_del_pattern , pattern):
+        util.printInvalidCommand()
+
+    #Check regex is valid
+    try:
+        re.compile(pattern)
+    except re.error:
+        util.printInvalidCommand()
+        
+    return pattern
+
+
 
 def getAddressInfo(cmd, cmd_info):
     """ 
@@ -38,10 +59,10 @@ def getAddressInfo(cmd, cmd_info):
     no_adrr     = r'^[qpds]'
     single_num  = r'(^(\d+)\s*)[qpds]'
     single_regx = r'(^/(.+)/\s*)[qpds]'
-    regx_regx   = r'(^/(.+)/\s*,\s*/(.+)/\s*)[qpds]'
-    regx_num    = r'(^/(.+)/\s*,\s*(\d+)\s*)[qpds]'
-    num_regx    = r'(^(\d+)\s*,\s*/(.+)/\s*)[qpds]'
-    num_num     = r'(^(\d+)\s*,\s*(\d+)\s*)[qpds]'
+    regx_regx   = r'(^/(.+)/\s*,\s*/(.+)/\s*)[pds]'
+    regx_num    = r'(^/(.+)/\s*,\s*(\d+)\s*)[pds]'
+    num_regx    = r'(^(\d+)\s*,\s*/(.+)/\s*)[pds]'
+    num_num     = r'(^(\d+)\s*,\s*(\d+)\s*)[pds]'
 
 
     if result := re.search(no_adrr, cmd):
@@ -49,20 +70,20 @@ def getAddressInfo(cmd, cmd_info):
 
     elif result := re.search(regx_regx, cmd):
         cmd_info.full_address     = result.group(1)
-        cmd_info.start_regexp     = result.group(2)
-        cmd_info.end_regexp       = result.group(3)
+        cmd_info.start_regexp     = isValidRegex(result.group(2))
+        cmd_info.end_regexp       = isValidRegex(result.group(3))
         cmd_info.is_address_found = True
 
     elif result := re.search(regx_num, cmd):
         cmd_info.full_address     = result.group(1)
-        cmd_info.start_regexp     = result.group(2)
+        cmd_info.start_regexp     = isValidRegex(result.group(2))
         cmd_info.end_num          = int(result.group(3))
         cmd_info.is_address_found = True
 
     elif result := re.search(num_regx, cmd):
         cmd_info.full_address = result.group(1)
         cmd_info.start_num    = int(result.group(2))
-        cmd_info.end_regexp   = result.group(3)
+        cmd_info.end_regexp   = isValidRegex(result.group(3))
         cmd_info.is_address_found  = True
 
     elif result := re.search(num_num, cmd):
@@ -78,8 +99,9 @@ def getAddressInfo(cmd, cmd_info):
 
     elif result := re.search(single_regx, cmd):
         cmd_info.full_address  = result.group(1)
-        cmd_info.single_regexp = result.group(2)
+        cmd_info.single_regexp = isValidRegex(result.group(2))
         cmd_info.is_address_found  = True
+
 
     else:
         util.printInvalidCommand()
@@ -117,8 +139,8 @@ def getCommandInfo(cmd, cmd_info):
 
         if result := re.search(s_pattern, cmd):
 
-            cmd_info.s_pattern = result.group(1)
-            cmd_info.s_replace = result.group(2)
+            cmd_info.s_pattern = isValidRegex(result.group(1), d)
+            cmd_info.s_replace = isValidRegex(result.group(2), d)
             
             if result.group(3).strip() == 'g':
                 cmd_info.s_global_flag = 0
@@ -144,8 +166,9 @@ def parseInput(input_cmd):
     input_cmd  = input_cmd.strip()
 
     cmd_info = Command()
-
     cmd_info = getAddressInfo(input_cmd, cmd_info)
+
+
 
     #Strip address from command 
     cmd_stripped = input_cmd

@@ -30,14 +30,22 @@ def performQuit(cmd_info, process):
     regex    = cmd_info.single_regexp
     line     = process.curr_line
     line_num = process.curr_line_num
-    
+
+    if not cmd_info.is_address_found: #slippy 'q' quits line 1
+        return True
+        
     if number:
         if line_num == number:
             return True
 
     elif regex:
-        if re.search(regex , line):
-            return True
+
+        try:
+            if re.search(regex , line):
+                return True
+        except re.error:
+            util.printInvalidCommand()
+
 
     return False
 
@@ -305,6 +313,8 @@ def performSubstitute(cmd_info, process):
 #------------------------------------------
 
 
+if len(sys.argv[1:]) == 0:
+    util.printUsage()
 
 
 argv = sys.argv[1:]
@@ -312,9 +322,9 @@ argv = sys.argv[1:]
 try:
     opts, args = getopt.getopt(argv, "nif")
 
+
 except getopt.GetoptError:
-    print(f'usage: slippy [-i] [-n] [-f <script-file> | <sed-command>] [<files>...]', file=sys.stderr)
-    sys.exit(1)
+    util.printUsage()
 
 if len(args) != 1:
     util.printError()

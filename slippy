@@ -196,7 +196,6 @@ def performDelete(cmd_info, process):
         if  result := re.search(end_regex, line) and cmd_info.regex_flag:
             cmd_info.regex_flag = False
 
-
     return cmd_info, process
 
 
@@ -256,7 +255,6 @@ def performSubstitute(cmd_info, process):
         begin = bool(start_num <= line_num)
         cmd_info.begin_flag = True  if begin else False
                
-
         if begin and not cmd_info.regex_flag:
             process.output_line = re.sub(cmd_info.s_pattern, cmd_info.s_replace, line, g_flag)
         else:
@@ -269,32 +267,34 @@ def performSubstitute(cmd_info, process):
     #---------'/regx/,n s/a/b/'---------
     elif start_regex != None and end_num != None:
 
-        
+        # Can match on same iteration unlike above.
         if re.search(start_regex, line) and cmd_info.regex_flag == False:
             cmd_info.regex_flag = True
 
         if cmd_info.regex_flag == True and end_num >= line_num:
-            process.output_line = None
+            process.output_line = re.sub(cmd_info.s_pattern, cmd_info.s_replace, line, g_flag)
         else:
             process.output_line = line
 
-    # #---------'/regx1/,/regx2/d'---------
-    # elif start_regex != None and end_regex != None:
-    #     if re.search(start_regex, line) and cmd_info.regex_flag == False:
-    #         cmd_info.regex_flag = True
-            
-    #     if cmd_info.regex_flag == True:
-    #         process.output_line = None
-    #     else:
-    #         process.output_line = line
 
-    #     if  result := re.search(end_regex, line) and cmd_info.regex_flag == True:
-    #         cmd_info.regex_flag = False
+    #---------'/regx1/,/regx2/ s/a/b/'---------
+    elif start_regex != None and end_regex != None:
 
-       
+        #Only start looking for ending regex the next iteration after begin starts
+        end = bool(re.search(end_regex, line)) if cmd_info.begin_flag else False
+        begin = bool(re.search(start_regex, line))
+     
+        if begin:
+            cmd_info.begin_flag = True
 
-    # cmd_info.regex_flag = cmd_info.regex_flag
+        if cmd_info.begin_flag and not cmd_info.regex_flag:
+            process.output_line = re.sub(cmd_info.s_pattern, cmd_info.s_replace, line, g_flag)
+        else:
+            process.output_line = line
 
+        if end:
+            cmd_info.regex_flag = True
+      
     return cmd_info, process
 
 

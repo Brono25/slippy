@@ -84,7 +84,6 @@ def getAddressInfo(cmd, cmd_info):
     else:
         util.printInvalidCommand()
 
-
     return cmd_info
 
 
@@ -120,7 +119,7 @@ def getCommandInfo(cmd, cmd_info):
 
             cmd_info.s_pattern = result.group(1)
             cmd_info.s_replace = result.group(2)
-
+            
             if result.group(3).strip() == 'g':
                 cmd_info.s_global_flag = 0
 
@@ -131,6 +130,7 @@ def getCommandInfo(cmd, cmd_info):
 
         else:
             util.printInvalidCommand()
+
 
     return cmd_info
  
@@ -150,8 +150,7 @@ def parseInput(input_cmd):
     #Strip address from command 
     cmd_stripped = input_cmd
     if cmd_info.full_address != None:
-        cmd_stripped = re.sub(re.escape(cmd_info.full_address), '', cmd_stripped)
-
+        cmd_stripped = re.sub(re.escape(cmd_info.full_address), '', cmd_stripped, 1)
     cmd_info = getCommandInfo(cmd_stripped, cmd_info)
 
     return cmd_info

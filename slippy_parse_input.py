@@ -49,6 +49,11 @@ def isValidRegex(pattern, d =r'/'):
         
     return pattern
 
+def isValidNumber(num):
+
+    if num == 0:
+        util.printInvalidCommand()
+    return num
 
 
 def getAddressInfo(cmd, cmd_info):
@@ -77,31 +82,30 @@ def getAddressInfo(cmd, cmd_info):
     elif result := re.search(regx_num, cmd):
         cmd_info.full_address     = result.group(1)
         cmd_info.start_regexp     = isValidRegex(result.group(2))
-        cmd_info.end_num          = int(result.group(3))
+        cmd_info.end_num          = isValidNumber(int(result.group(3)))
         cmd_info.is_address_found = True
 
     elif result := re.search(num_regx, cmd):
         cmd_info.full_address = result.group(1)
-        cmd_info.start_num    = int(result.group(2))
+        cmd_info.start_num    = isValidNumber(int(result.group(2)))
         cmd_info.end_regexp   = isValidRegex(result.group(3))
         cmd_info.is_address_found  = True
 
     elif result := re.search(num_num, cmd):
         cmd_info.full_address = result.group(1)
-        cmd_info.start_num    = int(result.group(2))
-        cmd_info.end_num      = int(result.group(3))
+        cmd_info.start_num    = isValidNumber(int(result.group(2)))
+        cmd_info.end_num      = isValidNumber(int(result.group(3)))
         cmd_info.is_address_found  = True
         
     elif result := re.search(single_num, cmd):
         cmd_info.full_address = result.group(1)
-        cmd_info.single_num   = int(result.group(2))
+        cmd_info.single_num   = isValidNumber(int(result.group(2)))
         cmd_info.is_address_found  = True
 
     elif result := re.search(single_regx, cmd):
         cmd_info.full_address  = result.group(1)
         cmd_info.single_regexp = isValidRegex(result.group(2))
         cmd_info.is_address_found  = True
-
 
     else:
         util.printInvalidCommand()

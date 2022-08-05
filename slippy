@@ -12,6 +12,7 @@ class Process:
     def __init__(self):
         self.curr_line        = None
         self.curr_line_num    = None
+        self.curr_line_status = None
         self.output_line      = None
         
 
@@ -22,7 +23,7 @@ class Process:
 #                FUNCTIONS
 #------------------------------------------
 
-def performQuit(cmd, process):
+def processQuit(cmd, process):
     """
     Exits program at provided address
     """
@@ -37,19 +38,17 @@ def performQuit(cmd, process):
     if number:
         if line_num == number:
             return True
-
     elif regex:
         try:
             if re.search(regex , line):
                 return True
         except re.error:
             util.printInvalidCommand()
-
     return False
 
 
 
-def performPrint(cmd_info, process):
+def processPrint(cmd_info, process):
     """
     Prints the current line if it falls within the bounds
     of an address.
@@ -68,14 +67,12 @@ def performPrint(cmd_info, process):
 
     #---------'p'---------
     if not cmd_info.is_address_found:
-        process.output_line = line
+        process.curr_line_status = 'PRINT'
 
     #---------'np'---------
     elif single_num:
         if single_num == line_num:
-            process.output_line = line
-        else:
-            process.output_line = None
+            process.curr_line_status = 'PRINT'
 
     #---------'/regx/p'---------
     elif single_regex:
@@ -344,10 +341,13 @@ for opt, _ in opts:
         option_n = True
 
 
+f = open('a', 'r')
+
 line_num = 1
 while True:
 
-    line = sys.stdin.readline()
+    #line = sys.stdin.readline()
+    line = f.readline()
     if line == '':
         break
 
@@ -359,25 +359,23 @@ while True:
     process.curr_line_num = line_num
 
     #execute commands on current line
-    for cmd in cmds:
+    for cmd_info in cmds:
 
         #----------Execute Quit----------
-        if cmd.operation == 'q':
-            if performQuit(cmd, process):
+        if cmd_info.operation == 'q':
+            if processQuit(cmd_info, process):
                 sys.exit(0)
 
 
         #----------Execute Print----------
         elif cmd_info.operation == 'p':
-            process.output_line = process.curr_line
+     
+            cmd_info, process = processPrint(cmd_info, process)
 
-            if option_n == False:
+            if process.curr_line_status == 'PRINT':
+                process.output_line = process.curr_line
                 print(process.output_line, end='')
-
-            cmd_info, process = performPrint(cmd_info, process)
-
-            if process.output_line != None:
-                print(process.output_line, end='')
+                process.curr_line_status = None
 
 
         #----------Execute Delete----------

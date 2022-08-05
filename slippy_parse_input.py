@@ -9,7 +9,7 @@ import slippy_utility as util
 class Command:
     def __init__(self):
         self.operation = None  # q,p,d,s
-        self.regex_flag = False
+        self.end_flag = False
         self.begin_flag = False
 
         # address info
@@ -202,6 +202,7 @@ def parseCommands(cmd_list):
     num_regx = r'^\d+\s*,\s*/.+/\s*(?:[pd]|s(.).*\1.*\1\s*g?\s*)\s*(?:#.*)?\s*[;\n]*\s*$'
     num_num = r'^\d+\s*,\s*\d+\s*(?:[pd]|s(.).*\1.*\1\s*g?\s*)\s*(?:#.*)?\s*[;\n]*\s*$'
 
+
     commands = list()
     max_greedy = len(re.findall('[\n;]', cmd_list)) + 1
     nth_greedy = 1
@@ -212,100 +213,99 @@ def parseCommands(cmd_list):
         parsed_nl = nthGreedyMatch(nth_greedy, cmd_list, '\n').strip('\n ;')
 
 
-
         if result := re.search(no_adrr, parsed_sc.strip()):
-            cmd_list = cmd_list.replace(parsed_sc, '')
+            cmd_list = cmd_list.replace(parsed_sc, '', 1)
             trim_cmd = re.sub(r'\s*(?:#.*)?\s*[;\n]*\s*$', '', result.group())
             commands.append(trim_cmd)
 
             nth_greedy = RESET_NTH_GREEDY
 
         elif result := re.search(no_adrr, parsed_nl.strip()):
-            cmd_list = cmd_list.replace(parsed_nl, '')
+            cmd_list = cmd_list.replace(parsed_nl, '', 1)
             trim_cmd = re.sub(r'\s*(?:#.*)?\s*[;\n]*\s*$', '', result.group())
             commands.append(trim_cmd)
 
             nth_greedy = RESET_NTH_GREEDY
 
         elif result := re.search(single_num, parsed_sc.strip()):
-            cmd_list = cmd_list.replace(parsed_sc, '')
+            cmd_list = cmd_list.replace(parsed_sc, '', 1)
             trim_cmd = re.sub(r'\s*(?:#.*)?\s*[;\n]*\s*$', '', result.group())
             commands.append(trim_cmd)
 
             nth_greedy = RESET_NTH_GREEDY
 
         elif result := re.search(single_num, parsed_nl.strip()):
-            cmd_list = cmd_list.replace(parsed_nl, '')
+            cmd_list = cmd_list.replace(parsed_nl, '', 1)
             trim_cmd = re.sub(r'\s*(?:#.*)?\s*[;\n]*\s*$', '', result.group())
             commands.append(trim_cmd)
 
             nth_greedy = RESET_NTH_GREEDY
 
         elif result := re.search(single_regx, parsed_sc.strip()):
-            cmd_list = cmd_list.replace(parsed_sc, '')
+            cmd_list = cmd_list.replace(parsed_sc, '', 1)
             trim_cmd = re.sub(r'\s*(?:#.*)?\s*[;\n]*\s*$', '', result.group())
             commands.append(trim_cmd)
 
             nth_greedy = RESET_NTH_GREEDY
 
         elif result := re.search(single_regx, parsed_nl.strip()):
-            cmd_list = cmd_list.replace(parsed_nl, '')
+            cmd_list = cmd_list.replace(parsed_nl, '', 1)
             trim_cmd = re.sub(r'\s*(?:#.*)?\s*[;\n]*\s*$', '', result.group())
             commands.append(trim_cmd)
 
             nth_greedy = RESET_NTH_GREEDY
 
         elif result := re.search(regx_regx, parsed_sc.strip()):
-            cmd_list = cmd_list.replace(parsed_sc, '')
+            cmd_list = cmd_list.replace(parsed_sc, '', 1)
             trim_cmd = re.sub(r'\s*(?:#.*)?\s*[;\n]*\s*$', '', result.group())
             commands.append(trim_cmd)
 
             nth_greedy = RESET_NTH_GREEDY
 
         elif result := re.search(regx_regx, parsed_nl.strip()):
-            cmd_list = cmd_list.replace(parsed_nl, '')
+            cmd_list = cmd_list.replace(parsed_nl, '', 1)
             trim_cmd = re.sub(r'\s*(?:#.*)?\s*[;\n]*\s*$', '', result.group())
             commands.append(trim_cmd)
 
             nth_greedy = RESET_NTH_GREEDY
 
         elif result := re.search(regx_num, parsed_sc.strip()):
-            cmd_list = cmd_list.replace(parsed_sc, '')
+            cmd_list = cmd_list.replace(parsed_sc, '', 1)
             trim_cmd = re.sub(r'\s*(?:#.*)?\s*[;\n]*\s*$', '', result.group())
             commands.append(trim_cmd)
 
             nth_greedy = RESET_NTH_GREEDY
 
         elif result := re.search(regx_num, parsed_nl.strip()):
-            cmd_list = cmd_list.replace(parsed_nl, '')
+            cmd_list = cmd_list.replace(parsed_nl, '', 1)
             trim_cmd = re.sub(r'\s*(?:#.*)?\s*[;\n]*\s*$', '', result.group())
             commands.append(trim_cmd)
 
             nth_greedy = RESET_NTH_GREEDY
 
         elif result := re.search(num_regx, parsed_sc.strip()):
-            cmd_list = cmd_list.replace(parsed_sc, '')
+            cmd_list = cmd_list.replace(parsed_sc, '', 1)
             trim_cmd = re.sub(r'\s*(?:#.*)?\s*[;\n]*\s*$', '', result.group())
             commands.append(trim_cmd)
 
             nth_greedy = RESET_NTH_GREEDY
 
         elif result := re.search(num_regx, parsed_nl.strip()):
-            cmd_list = cmd_list.replace(parsed_nl, '')
+            cmd_list = cmd_list.replace(parsed_nl, '', 1)
             trim_cmd = re.sub(r'\s*(?:#.*)?\s*[;\n]*\s*$', '', result.group())
             commands.append(trim_cmd)
 
             nth_greedy = RESET_NTH_GREEDY
 
         elif result := re.search(num_num, parsed_sc.strip()):
-            cmd_list = cmd_list.replace(parsed_sc, '')
+            cmd_list = cmd_list.replace(parsed_sc, '', 1)
             trim_cmd = re.sub(r'\s*(?:#.*)?\s*[;\n]*\s*$', '', result.group())
             commands.append(trim_cmd)
 
             nth_greedy = RESET_NTH_GREEDY
 
         elif result := re.search(num_num, parsed_nl.strip()):
-            cmd_list = cmd_list.replace(parsed_nl, '')
+            cmd_list = cmd_list.replace(parsed_nl, '', 1)
             trim_cmd = re.sub(r'\s*(?:#.*)?\s*[;\n]*\s*$', '', result.group())
             commands.append(trim_cmd)
 

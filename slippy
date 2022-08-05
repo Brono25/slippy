@@ -326,12 +326,13 @@ try:
 except getopt.GetoptError:
     util.printUsage()
 
-if len(args) != 1:
-    util.printError()
+#if len(args) != 1:
+    #util.printError()
 
 
 input_cmd = args[0]
 process   = Process() #holds info of the current command executions
+
 cmd_info  = parse.parseInput(input_cmd)
 
 option_n = False

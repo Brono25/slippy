@@ -77,25 +77,30 @@ def processPrint(cmd_info, process):
     #---------'/regx/p'---------
     elif single_regex:
         if re.search(single_regex, line):
-            process.output_line = line
-        else:
-            process.output_line = None
+            process.curr_line_status = 'PRINT'
 
     #---------'n1,n2p'---------
     elif start_num and end_num:
         if start_num <= line_num <= end_num:
-            process.output_line = line
-        else:
-            process.output_line = None
+            process.curr_line_status = 'PRINT'
 
     #---------'n,/regx/p'---------
     elif start_num and end_regex:
-        if start_num <= line_num and not cmd_info.regex_flag:
-            process.output_line = line
-            if re.search(end_regex, line):
-                cmd_info.regex_flag = True
-        else:
-            process.output_line = None
+
+        if re.search(end_regex, line) and cmd_info.begin_flag:
+            cmd_info.end_flag = True
+            cmd_info.begin_flag = False
+            process.curr_line_status = 'PRINT'
+
+        if start_num <= line_num and not cmd_info.end_flag:
+            cmd_info.begin_flag = True
+
+        if cmd_info.begin_flag and not cmd_info.end_flag:
+            process.curr_line_status = 'PRINT'
+
+
+
+
 
     #---------'/regx/,np'---------
     elif start_regex and end_num:
@@ -369,13 +374,14 @@ while True:
 
         #----------Execute Print----------
         elif cmd_info.operation == 'p':
-     
+
             cmd_info, process = processPrint(cmd_info, process)
 
             if process.curr_line_status == 'PRINT':
                 process.output_line = process.curr_line
                 print(process.output_line, end='')
-                process.curr_line_status = None
+
+            process.curr_line_status = None
 
 
         #----------Execute Delete----------

@@ -202,7 +202,6 @@ def parseCommands(cmd_list):
     num_regx = r'^\d+\s*,\s*/.+/\s*(?:[pd]|s(.).*\1.*\1\s*g?\s*)\s*(?:#.*)?\s*[;\n]*\s*$'
     num_num = r'^\d+\s*,\s*\d+\s*(?:[pd]|s(.).*\1.*\1\s*g?\s*)\s*(?:#.*)?\s*[;\n]*\s*$'
 
-    breakpoint()
     commands = list()
     max_greedy = len(re.findall('[\n;]', cmd_list)) + 1
     nth_greedy = 1
@@ -316,19 +315,21 @@ def parseCommands(cmd_list):
             nth_greedy += 1
 
         if nth_greedy > max_greedy:
-            print('Invalid Command')
-            return 1
+            util.printInvalidCommand()
 
     return commands
 
 
 def parseInput(slippy_input):
+
+    #raw input from argv
     slippy_input = slippy_input.strip()
 
-
+    #list of parsed commands from raw input
     cmd_list = parseCommands(slippy_input)
 
-    commands_to_run = list()
+    #parse all the information about each command and store here
+    executable_cmds = list()
 
     for cmd in cmd_list:
 
@@ -339,9 +340,10 @@ def parseInput(slippy_input):
         cmd_stripped = cmd
         if cmd_info.full_address != None:
             cmd_stripped = re.sub(re.escape(cmd_info.full_address), '', cmd_stripped, 1)
+
         cmd_info = getCommandInfo(cmd_stripped, cmd_info)
 
-        commands_to_run.append(cmd_info) #
+        executable_cmds.append(cmd_info)
 
 
-    return commands_to_run
+    return executable_cmds

@@ -22,16 +22,16 @@ class Process:
 #                FUNCTIONS
 #------------------------------------------
 
-def performQuit(cmd_info, process):
+def performQuit(cmd, process):
     """
     Exits program at provided address
     """
-    number   = cmd_info.single_num
-    regex    = cmd_info.single_regexp
+    number   = cmd.single_num
+    regex    = cmd.single_regexp
     line     = process.curr_line
     line_num = process.curr_line_num
 
-    if not cmd_info.is_address_found: #slippy 'q' quits line 1
+    if not cmd.is_address_found: #slippy 'q' quits line 1
         return True
         
     if number:
@@ -39,13 +39,11 @@ def performQuit(cmd_info, process):
             return True
 
     elif regex:
-
         try:
             if re.search(regex , line):
                 return True
         except re.error:
             util.printInvalidCommand()
-
 
     return False
 
@@ -333,7 +331,7 @@ except getopt.GetoptError:
 input_cmd = args[0]
 process   = Process() #holds info of the current command executions
 
-cmd_info  = parse.parseInput(input_cmd)
+cmds  = parse.parseInput(input_cmd)
 
 option_n = False
 option_i = False
@@ -353,46 +351,49 @@ while True:
     if line == '':
         break
 
+    if not option_n:
+        print(line, end='')
+
     #----------update process----------
     process.curr_line = line
     process.curr_line_num = line_num
 
+    #execute commands on current line
+    for cmd in cmds:
 
-    #----------Execute Quit----------
-    if cmd_info.operation == 'q':
-        process.output_line = process.curr_line
-        print(process.output_line, end='')
-        if performQuit(cmd_info, process):
-            sys.exit(0)
-
-
-    #----------Execute Print----------
-    elif cmd_info.operation == 'p':
-        process.output_line = process.curr_line
-
-        if option_n == False:
-            print(process.output_line, end='')
-
-        cmd_info, process = performPrint(cmd_info, process)
-
-        if process.output_line != None:
-            print(process.output_line, end='')
+        #----------Execute Quit----------
+        if cmd.operation == 'q':
+            if performQuit(cmd, process):
+                sys.exit(0)
 
 
-    #----------Execute Delete----------
-    elif cmd_info.operation == 'd':
-        cmd_info, process = performDelete(cmd_info, process)
-        if process.output_line != None and option_n != True:
-            print(process.output_line, end='')
-    
+        #----------Execute Print----------
+        elif cmd_info.operation == 'p':
+            process.output_line = process.curr_line
 
-     #----------Execute Substitute----------
-    elif cmd_info.operation == 's':
-        cmd_info, process = performSubstitute(cmd_info, process)
-        
-        if process.output_line != None and option_n != True:
-            print(process.output_line, end='')
-        
+            if option_n == False:
+                print(process.output_line, end='')
+
+            cmd_info, process = performPrint(cmd_info, process)
+
+            if process.output_line != None:
+                print(process.output_line, end='')
+
+
+        #----------Execute Delete----------
+        elif cmd_info.operation == 'd':
+            cmd_info, process = performDelete(cmd_info, process)
+            if process.output_line != None and option_n != True:
+                print(process.output_line, end='')
+
+
+         #----------Execute Substitute----------
+        elif cmd_info.operation == 's':
+            cmd_info, process = performSubstitute(cmd_info, process)
+
+            if process.output_line != None and option_n != True:
+                print(process.output_line, end='')
+
 
 
 

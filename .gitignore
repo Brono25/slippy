@@ -2,7 +2,6 @@
 .DS_Store
 ._*
 *.txt
-*test*
 makefile
 scrap*
 __pycache__

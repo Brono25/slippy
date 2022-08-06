@@ -196,7 +196,7 @@ def processDelete(cmd_info, process):
             cmd_info.begin_flag = False
             process.curr_line_status = 'DELETE'
 
-        if start_num == line_num:
+        if line and start_num <= line_num and not cmd_info.end_flag:
             cmd_info.begin_flag = True
 
         if cmd_info.begin_flag and not cmd_info.end_flag:
@@ -341,7 +341,6 @@ def processSubstitute(cmd_info, process):
 #                  MAIN
 #------------------------------------------
 
-
 if len(sys.argv[1:]) == 0:
     util.printUsage()
 
@@ -376,13 +375,13 @@ for opt, _ in opts:
 
 
 
-# f = open('b', 'r')
+f = open('b', 'r')
 
 line_num = 1
 while True:
 
-    line = sys.stdin.readline()
-    # line = f.readline()
+    #line = sys.stdin.readline()
+    line = f.readline()
     if line == '':
         break
 

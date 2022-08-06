@@ -64,7 +64,6 @@ def processPrint(cmd_info, process):
     line         = process.output_line
     line_num     = process.curr_line_num
 
-
     #---------'p'---------
     if not cmd_info.is_address_found:
         process.curr_line_status = 'PRINT'
@@ -374,13 +373,13 @@ for opt, _ in opts:
 
 
 
-#f = open('b', 'r')
+f = open('b', 'r')
 
 line_num = 1
 while True:
 
-    line = sys.stdin.readline()
-    #line = f.readline()
+    #line = sys.stdin.readline()
+    line = f.readline()
     if line == '':
         break
 
@@ -400,9 +399,10 @@ while True:
 
         #----------Execute Print----------
         elif cmd_info.operation == 'p':
-            cmd_info, process = processPrint(cmd_info, process)
-            
+
             process.output_line = process.curr_line
+            cmd_info, process = processPrint(cmd_info, process)
+
             if process.curr_line_status == 'PRINT' and process.curr_line != None:
                 print(process.output_line, end='')
 

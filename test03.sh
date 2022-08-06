@@ -197,49 +197,51 @@ test_outcome "$output" "$expected_output"
 
 
 
-# echo "-------------VALID /regx/,n d------------"
-# (
-# cat input | slippy  '/1/,2d'
-# cat input | slippy  '/[0-9]/,1d' 
-# cat input | slippy  '/1/,100d'
-# cat input | slippy  '/1/,10d; /2/, 10d; /3/,10d'
-# cat input | slippy  '1,10d; /2/, 10d;'
-# ) > "$output" 
+echo "-------------VALID /regx/,n s/a/b/------------"
+(
+cat input | slippy  '/1/,2s/1/x/g'
+cat input | slippy  '/[0-9]/,1s/1/x/g' 
+cat input | slippy  '/1/,100s/1/x/g'
+cat input | slippy  '/1/,10d; /2/, 10s/1/x/g; /3/,10s/1/x/g'
+cat input | slippy  '1,10d; /2/, 10s/1/x/g;'
+) > "$output" 
 
-# (
-# cat input | 2041 slippy  '/1/,2d'
-# cat input | 2041 slippy  '/[0-9]/,1d' 
-# cat input | 2041 slippy  '/1/,100d'
-# cat input | 2041 slippy  '/1/,10d; /2/, 10d; /3/,10d'
-# cat input | 2041 slippy  '1,10d; /2/, 10d;'
-# ) > "$expected_output" 
+(
+cat input | 2041 slippy  '/1/,2s/1/x/g'
+cat input | 2041 slippy  '/[0-9]/,1s/1/x/g' 
+cat input | 2041 slippy  '/1/,100s/1/x/g'
+cat input | 2041 slippy  '/1/,10d; /2/, 10s/1/x/g; /3/,10s/1/x/g'
+cat input | 2041 slippy  '1,10d; /2/, 10s/1/x/g;'
+) > "$expected_output" 
 
-# test_outcome "$output" "$expected_output"
-
-
+test_outcome "$output" "$expected_output"
 
 
 
 
-# echo "-------------VALID /regx1/,/regx2/ d------------"
-# (
-# cat input | slippy '/1/,/1/d'
-# cat input | slippy '/1/,/2/d'
-# cat input | slippy '/./,/2/d'
-# cat input | slippy '1,10d;/2/,/2/d'
-# cat input | slippy '/1/,/1/d ; /1/,/1/d'
-# ) > "$output" 
 
-# (
-# cat input | 2041 slippy '/1/,/1/d'
-# cat input | 2041 slippy '/1/,/2/d'
-# cat input | 2041 slippy '/./,/2/d'
-# cat input | 2041 slippy '1,10d;/2/,/2/d'
-# cat input | 2041 slippy '/1/,/1/d ; /1/,/1/d'
 
-# ) > "$expected_output" 
+echo "-------------VALID /regx1/,/regx2/ s/a/b/------------"
+(
+cat input | slippy '/1/,/1/s/1/x/g'
+cat input | slippy '/1/,/2/s/1/x/g'
+cat input | slippy '/./,/2/s/1/x/g'
+cat input | slippy '1,10d;/2/,/2/s/1/x/g'
+cat input | slippy '/1/,/1/s/1/x/g ; /1/,/1/s/1//g'
+cat input | slippy '1,10d;/./,/./s/1//g'
+) > "$output" 
 
-# test_outcome "$output" "$expected_output"
+(
+cat input | 2041 slippy '/1/,/1/s/1/x/g'
+cat input | 2041 slippy '/1/,/2/s/1/x/g'
+cat input | 2041 slippy '/./,/2/s/1/x/g'
+cat input | 2041 slippy '1,10d;/2/,/2/s/1/x/g'
+cat input | 2041 slippy '/1/,/1/s/1/x/g ; /1/,/1/s/1//g'
+cat input | 2041 slippy '1,10d;/./,/./s/1//g'
+
+) > "$expected_output" 
+
+test_outcome "$output" "$expected_output"
 
 
 

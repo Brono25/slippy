@@ -213,13 +213,12 @@ def processDelete(cmd_info, process):
         if not cmd_info.begin_flag and match:
             cmd_info.begin_flag = True
 
-        if cmd_info.begin_flag and line_num <= end_num:
-            process.curr_line_status = 'DELETE'
-        elif match:
+        if cmd_info.begin_flag and line_num <= end_num or match:
             process.curr_line_status = 'DELETE'
 
 
-    #---------'/regx1/,/regx2/p'---------
+
+    #---------'/regx1/,/regx2/d'---------
     elif start_regex and end_regex:
 
         if line and re.search(end_regex, line) and cmd_info.begin_flag:
@@ -299,36 +298,39 @@ def processSubstitute(cmd_info, process):
         if cmd_info.begin_flag and not cmd_info.end_flag:
             process.output_line = re.sub(cmd_info.s_pattern, cmd_info.s_replace, line, g_flag)
 
-    #---------'/regx/,n s/a/b/'---------
-    elif start_regex != None and end_num != None:
 
-        # Can match on same iteration unlike above.
-        if line and re.search(start_regex, line) and cmd_info.regex_flag == False:
-            cmd_info.regex_flag = True
+     #---------'/regx/,n s/a/b/'---------
+    elif start_regex and end_num:
+ 
+        try: #gaurd from deleted lines
+            match = bool(re.search(start_regex, line))
+        except TypeError:
+            match = False
 
-        if line and cmd_info.regex_flag == True and end_num >= line_num:
+        if not cmd_info.begin_flag and match:
+            cmd_info.begin_flag = True
+
+        if cmd_info.begin_flag and line_num <= end_num or match:
             process.output_line = re.sub(cmd_info.s_pattern, cmd_info.s_replace, line, g_flag)
-        else:
-            process.output_line = line
+
 
 
     #---------'/regx1/,/regx2/ s/a/b/'---------
-    elif start_regex != None and end_regex != None:
+    elif start_regex and end_regex:
 
-        #Only start looking for ending regex the next iteration after begin starts
-        end = bool(re.search(end_regex, line)) if cmd_info.begin_flag else False
-        begin = bool(re.search(start_regex, line))
-     
-        if begin:
+        if line and re.search(end_regex, line) and cmd_info.begin_flag:
+            cmd_info.end_flag = True
+            process.output_line = re.sub(cmd_info.s_pattern, cmd_info.s_replace, line, g_flag)
+
+        if line and not cmd_info.end_flag and re.search(start_regex, line):
             cmd_info.begin_flag = True
 
-        if line and cmd_info.begin_flag and not cmd_info.regex_flag:
+        if cmd_info.begin_flag and not cmd_info.end_flag:
             process.output_line = re.sub(cmd_info.s_pattern, cmd_info.s_replace, line, g_flag)
-        else:
-            process.output_line = line
 
-        if end:
-            cmd_info.regex_flag = True
+        if line and cmd_info.begin_flag and cmd_info and cmd_info.end_flag:
+            cmd_info.begin_flag = False
+            cmd_info.end_flag = False
       
     return cmd_info, process
 
@@ -373,13 +375,13 @@ for opt, _ in opts:
 
 
 
-f = open('b', 'r')
+# f = open('b', 'r')
 
 line_num = 1
 while True:
 
-    #line = sys.stdin.readline()
-    line = f.readline()
+    line = sys.stdin.readline()
+    # line = f.readline()
     if line == '':
         break
 

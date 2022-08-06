@@ -61,7 +61,7 @@ def processPrint(cmd_info, process):
     end_num      = cmd_info.end_num
     end_regex    = cmd_info.end_regexp
 
-    line         = process.curr_line
+    line         = process.output_line
     line_num     = process.curr_line_num
 
 
@@ -278,31 +278,27 @@ def processSubstitute(cmd_info, process):
     elif single_regex:
         if line and re.search(single_regex, line):
             process.output_line = re.sub(cmd_info.s_pattern, cmd_info.s_replace, line, g_flag)
-        else:
-            process.output_line = line
+
 
     #---------'n1,n2 s/a/b/'---------
     elif start_num and end_num:
-        if line != None and start_num <= line_num <= end_num:
+        if line and start_num <= line_num <= end_num:
             process.output_line = re.sub(cmd_info.s_pattern, cmd_info.s_replace, line, g_flag)
-        else:
-            process.output_line = line
+
 
     #---------'n,/regx/s/a/b/'---------
     elif start_num and end_regex:
 
-        #Only start looking for ending regex the next iteration after begin starts
-        end = bool(re.search(end_regex, line)) if cmd_info.begin_flag else False
-        begin = bool(start_num <= line_num)
-        cmd_info.begin_flag = True  if begin else False
-               
-        if line and begin and not cmd_info.regex_flag:
+        if line and re.search(end_regex, line) and cmd_info.begin_flag:
+            cmd_info.end_flag = True
+            cmd_info.begin_flag = False
             process.output_line = re.sub(cmd_info.s_pattern, cmd_info.s_replace, line, g_flag)
-        else:
-            process.output_line = line
 
-        if end:
-            cmd_info.regex_flag = True
+        if start_num == line_num:
+            cmd_info.begin_flag = True
+
+        if line and cmd_info.begin_flag and not cmd_info.end_flag:
+            process.output_line = re.sub(cmd_info.s_pattern, cmd_info.s_replace, line, g_flag)
 
 
     #---------'/regx/,n s/a/b/'---------
@@ -380,13 +376,13 @@ for opt, _ in opts:
 
 
 
-f = open('b', 'r')
+# f = open('b', 'r')
 
 line_num = 1
 while True:
 
-    #line = sys.stdin.readline()
-    line = f.readline()
+    line = sys.stdin.readline()
+    # line = f.readline()
     if line == '':
         break
 
@@ -428,7 +424,9 @@ while True:
 
          #----------Execute Substitute----------
         elif cmd_info.operation == 's':
+
             cmd_info, process = processSubstitute(cmd_info, process)
+            process.curr_line = process.output_line
 
 
 

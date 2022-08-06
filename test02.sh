@@ -254,9 +254,100 @@ seq 25 | 2041 slippy  '1,5p; 2,7p; 4,10d'
 seq 25 | 2041 slippy  '1,5d; 2,7d; 4,10p'
 seq 25 | 2041 slippy  '1,5p; 2,7d; 4,10d'
 
-
 ) > "$expected_output" 
 test_outcome "$output" "$expected_output"
+
+
+echo "-------------INVALID n, /regx/d------------"
+(
+seq 25 | slippy  '2,///d'
+seq 25 | slippy  '1,xd'
+seq 25 | slippy  'x,/1/d'
+seq 25 | slippy  '/x/,1,d'
+) 2> "$output" 
+
+(
+seq 25 | 2041 slippy  '2,///d'
+seq 25 | 2041 slippy  '1,xd'
+seq 25 | 2041 slippy  'x,/1/d'
+seq 25 | 2041 slippy  '/x/,1,d'
+) 2> "$expected_output" 
+
+test_outcome "$output" "$expected_output"
+
+
+echo "-------------VALID n, /regx/ d------------"
+(
+seq 25 | slippy  '1,/1/d'
+seq 25 | slippy  '10,/1/d'
+seq 25 | slippy  '1,/[0-9]/d'
+seq 25 | slippy  '10,/1/d; 5,/1/d; 1,/^[0-9]$/d'
+seq 25 | slippy  '1, /5/d; 2,/5/d'
+
+
+) > "$output" 
+
+(
+seq 25 | 2041 slippy  '1,/1/d'
+seq 25 | 2041 slippy  '10,/1/d'
+seq 25 | 2041 slippy  '1,/[0-9]/d'
+seq 25 | 2041 slippy  '10,/1/d; 5,/1/d; 1,/^[0-9]$/d'
+
+) > "$expected_output" 
+
+test_outcome "$output" "$expected_output"
+
+
+
+
+
+echo "-------------INVALID /regx/,n d------------"
+(
+seq 25 | slippy  '///,1d'
+seq 25 | slippy  'x,1d'
+seq 25 | slippy  'x,1d'
+seq 25 | slippy  'x,1,d'
+) 2> "$output" 
+
+(
+seq 25 | 2041 slippy  '///,1d'
+seq 25 | 2041 slippy  'x,1d'
+seq 25 | 2041 slippy  'x,1d'
+seq 25 | 2041 slippy  'x,1,d'
+) 2> "$expected_output" 
+
+test_outcome "$output" "$expected_output"
+
+
+echo "-------------VALID /regx/,n d------------"
+(
+seq 25 | slippy  '/1/,1d'
+seq 25 | slippy  '/[0-9]/,1d' 
+seq 25 | slippy  '/1/,100d'
+seq 25 | slippy  '/1/,10d; /2/, 10d; /3/,10d'
+
+) > "$output" 
+
+(
+seq 25 | 2041 slippy  '/1/,1d'
+seq 25 | 2041 slippy  '/[0-9]/,1d' 
+seq 25 | 2041 slippy  '/1/,100d'
+seq 25 | 2041 slippy  '/1/,10d; /2/, 10d; /3/,10d'
+
+) > "$expected_output" 
+
+test_outcome "$output" "$expected_output"
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -214,16 +214,48 @@ seq 25 | slippy -n '1,5d; 2,10p'
 seq 25 | slippy -n '1,5p; 2,10d'
 seq 25 | slippy -n '1,5p; 2,10p'
 seq 25 | slippy  '1,10d; 10,12d'
+seq 25 | slippy  '1,25d; 1,25d'
+seq 25 | slippy  '1,25d; 1,25p'
+seq 25 | slippy  '1,25p; 1,25d'
+seq 25 | slippy  '1,25p; 1,25p'
+seq 25 | slippy  '1,25d; 2,24d'
+seq 25 | slippy  '1,25d; 2,24p'
+seq 25 | slippy  '1,25p; 2,24d'
+seq 25 | slippy  '1,25p; 2,24p'
+seq 25 | slippy  '1,5p; 2,7p; 4,10p'
+seq 25 | slippy  '1,5d; 2,7d; 4,10d'
+seq 25 | slippy  '1,5d; 2,7p; 4,10p'
+seq 25 | slippy  '1,5p; 2,7d; 4,10p'
+seq 25 | slippy  '1,5p; 2,7p; 4,10d'
+seq 25 | slippy  '1,5d; 2,7d; 4,10p'
+seq 25 | slippy  '1,5p; 2,7d; 4,10d'
 
 ) > "$output" 
 
 (
 seq 25 | 2041 slippy '1,5d; 2,10d'
-seq 25 | 2041 slippy -n '1,5p; 2,10p'
 seq 25 | 2041 slippy -n '1,5d; 2,10p'
+seq 25 | 2041 slippy -n '1,5p; 2,10d'
+seq 25 | 2041 slippy -n '1,5p; 2,10p'
+seq 25 | 2041 slippy  '1,10d; 10,12d'
+seq 25 | 2041 slippy  '1,25d; 1,25d'
+seq 25 | 2041 slippy  '1,25d; 1,25p'
+seq 25 | 2041 slippy  '1,25p; 1,25d'
+seq 25 | 2041 slippy  '1,25p; 1,25p'
+seq 25 | 2041 slippy  '1,25d; 2,24d'
+seq 25 | 2041 slippy  '1,25d; 2,24p'
+seq 25 | 2041 slippy  '1,25p; 2,24d'
+seq 25 | 2041 slippy  '1,25p; 2,24p'
+seq 25 | 2041 slippy  '1,5p; 2,7p; 4,10p'
+seq 25 | 2041 slippy  '1,5d; 2,7d; 4,10d'
+seq 25 | 2041 slippy  '1,5d; 2,7p; 4,10p'
+seq 25 | 2041 slippy  '1,5p; 2,7d; 4,10p'
+seq 25 | 2041 slippy  '1,5p; 2,7p; 4,10d'
+seq 25 | 2041 slippy  '1,5d; 2,7d; 4,10p'
+seq 25 | 2041 slippy  '1,5p; 2,7d; 4,10d'
+
 
 ) > "$expected_output" 
-
 test_outcome "$output" "$expected_output"
 
 

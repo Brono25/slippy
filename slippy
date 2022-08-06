@@ -260,7 +260,7 @@ def processSubstitute(cmd_info, process):
     line         = process.curr_line
     line_num     = process.curr_line_num
     
-
+    process.output_line = line
     
     #---------'s/a/b/'---------
     if not cmd_info.is_address_found:
@@ -273,8 +273,6 @@ def processSubstitute(cmd_info, process):
         
         if line and single_num == line_num:
             process.output_line = re.sub(cmd_info.s_pattern, cmd_info.s_replace, line, g_flag)
-        else:
-            process.output_line = line
 
     #---------'/regx/s/a/b/'---------
     elif single_regex:
@@ -285,7 +283,7 @@ def processSubstitute(cmd_info, process):
 
     #---------'n1,n2 s/a/b/'---------
     elif start_num and end_num:
-        if line and start_num <= line_num <= end_num:
+        if line != None and start_num <= line_num <= end_num:
             process.output_line = re.sub(cmd_info.s_pattern, cmd_info.s_replace, line, g_flag)
         else:
             process.output_line = line
@@ -382,13 +380,13 @@ for opt, _ in opts:
 
 
 
-#f = open('b', 'r')
+f = open('b', 'r')
 
 line_num = 1
 while True:
 
-    line = sys.stdin.readline()
-    #line = f.readline()
+    #line = sys.stdin.readline()
+    line = f.readline()
     if line == '':
         break
 
@@ -430,7 +428,6 @@ while True:
 
          #----------Execute Substitute----------
         elif cmd_info.operation == 's':
-
             cmd_info, process = processSubstitute(cmd_info, process)
 
 

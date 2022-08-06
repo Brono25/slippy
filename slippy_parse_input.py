@@ -92,6 +92,8 @@ def getAddressInfo(cmd, cmd_info):
         cmd_info.full_address = result.group(1)
         cmd_info.start_num = isValidNumber(int(result.group(2)))
         cmd_info.end_num = isValidNumber(int(result.group(3)))
+        if cmd_info.end_num < cmd_info.start_num:
+            cmd_info.end_num = cmd_info.start_num
         cmd_info.is_address_found = True
 
     elif result := re.search(single_num, cmd):

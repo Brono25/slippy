@@ -219,8 +219,10 @@ seq 25 | slippy  '1,10d; 10,12d'
 
 (
 seq 25 | 2041 slippy '1,5d; 2,10d'
-seq 25 | 2041 slippy -n '1,5p; 2,10p'
 seq 25 | 2041 slippy -n '1,5d; 2,10p'
+seq 25 | 2041 slippy -n '1,5p; 2,10d'
+seq 25 | 2041 slippy -n '1,5p; 2,10p'
+seq 25 | 2041 slippy  '1,10d; 10,12d'
 
 ) > "$expected_output" 
 

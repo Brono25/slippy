@@ -356,8 +356,8 @@ f = open('a', 'r')
 line_num = 1
 while True:
 
-    line = sys.stdin.readline()
-    #line = f.readline()
+    #line = sys.stdin.readline()
+    line = f.readline()
     if line == '':
         break
 

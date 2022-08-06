@@ -37,6 +37,7 @@ def isValidRegex(pattern, d=r'/'):
     unescaped_del_pattern = rf'[^\\]{d}|^{d}'
 
 
+
     try:
         # Check for un-escaped delimeters
         if re.search(unescaped_del_pattern, pattern):
@@ -135,8 +136,8 @@ def getCommandInfo(cmd, cmd_info):
     if cmd_info.operation == 's':
 
         try:
-            d = cmd[1]  # delimeter is first character after 's'
-            cmd_info.delimiter = d
+            d = re.escape(cmd[1])  # delimeter is first character after 's'
+
         except IndexError:
             util.printInvalidCommand()
 
@@ -338,6 +339,7 @@ def parseInput(slippy_input):
 
     for cmd in cmd_list:
 
+
         cmd_info = Command()
         cmd_info = getAddressInfo(cmd, cmd_info)
 
@@ -345,6 +347,7 @@ def parseInput(slippy_input):
         cmd_stripped = cmd
         if cmd_info.full_address != None:
             cmd_stripped = re.sub(re.escape(cmd_info.full_address), '', cmd_stripped, 1)
+
 
         cmd_info = getCommandInfo(cmd_stripped, cmd_info)
 

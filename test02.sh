@@ -118,11 +118,13 @@ seq 25 | slippy '/ /d'
 seq 25 | slippy '/^2/d'
 seq 25 | slippy '/\//d'
 seq 25 | slippy '/ \ /d'
+seq 25 | slippy '1,20d; /2/d'
 
 seq 25 | slippy -n '/ /d'
 seq 25 | slippy -n  '/^2/d'
 seq 25 | slippy -n  '/\//d'
 seq 25 | slippy -n  '/ \ /d'
+seq 25 | slippy -n '1,20d; /2/d'
 
 ) > "$output" 
 
@@ -131,11 +133,13 @@ seq 25 | 2041  slippy '/ /d'
 seq 25 | 2041  slippy '/^2/d'
 seq 25 | 2041  slippy '/\//d'
 seq 25 | 2041  slippy '/ \ /d'
+seq 25 | 2041  slippy '1,20d; /2/d'
 
 seq 25 | 2041  slippy -n   '/ /d'
 seq 25 | 2041  slippy -n  '/^2/d'
 seq 25 | 2041  slippy -n  '/\//d'
 seq 25 | 2041  slippy -n  '/ \ /d'
+seq 25 | 2041  slippy -n '1,20d; /2/d'
 
 ) > "$expected_output" 
 
@@ -283,7 +287,7 @@ seq 25 | slippy  '10,/1/d'
 seq 25 | slippy  '1,/[0-9]/d'
 seq 25 | slippy  '10,/1/d; 5,/1/d; 1,/^[0-9]$/d'
 seq 25 | slippy  '1, /5/d; 2,/5/d'
-
+seq 25 | slippy  '1, 10d; 2,/5/d'
 
 ) > "$output" 
 

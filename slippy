@@ -64,7 +64,6 @@ def processPrint(cmd_info, process):
     line         = process.curr_line
     line_num     = process.curr_line_num
 
-    line_deleted = bool(process.curr_line == None)
 
     #---------'p'---------
     if not cmd_info.is_address_found:
@@ -83,7 +82,7 @@ def processPrint(cmd_info, process):
     #---------'n1,n2p'---------
     elif start_num and end_num:
 
-        if start_num == line_num and not line_deleted:
+        if start_num == line_num:
             cmd_info.begin_flag = True
 
         if cmd_info.begin_flag and not cmd_info.end_flag:
@@ -195,7 +194,7 @@ def performDelete(cmd_info, process):
             cmd_info.begin_flag = False
             process.curr_line_status = 'DELETE'
 
-        if start_num == line_num and not line_deleted:
+        if start_num == line_num:
             cmd_info.begin_flag = True
 
         if cmd_info.begin_flag and not cmd_info.end_flag:
@@ -368,13 +367,13 @@ for opt, _ in opts:
 
 
 
-#f = open('a', 'r')
+f = open('b', 'r')
 
 line_num = 1
 while True:
 
-    line = sys.stdin.readline()
-    #line = f.readline()
+    #line = sys.stdin.readline()
+    line = f.readline()
     if line == '':
         break
 
@@ -405,8 +404,9 @@ while True:
         #----------Execute Delete----------
         elif cmd_info.operation == 'd':
             process.output_line = process.curr_line
-            if process.curr_line != None:
-                cmd_info, process = performDelete(cmd_info, process)
+
+            cmd_info, process = performDelete(cmd_info, process)
+
             if process.curr_line_status == 'DELETE':
                 process.curr_line = None
                 process.output_line = None

@@ -154,7 +154,7 @@ def performDelete(cmd_info, process):
 
     #---------'d'---------
     if not cmd_info.is_address_found:
-        process.output_line = None
+        process.output_line = 'DELETE'
 
     #---------'nd'---------
     elif single_num:
@@ -361,8 +361,7 @@ while True:
     if line == '':
         break
 
-    if not option_n:
-        print(line, end='')
+    
 
     #----------update process----------
     process.curr_line = line
@@ -392,8 +391,9 @@ while True:
         #----------Execute Delete----------
         elif cmd_info.operation == 'd':
             cmd_info, process = performDelete(cmd_info, process)
-            if process.output_line != None and option_n != True:
-                print(process.output_line, end='')
+            if process.curr_line_status == 'DELETE':
+                process.curr_line_status = None
+                continue
 
 
          #----------Execute Substitute----------
@@ -404,6 +404,8 @@ while True:
                 print(process.output_line, end='')
 
 
+    if not option_n:
+        print(line, end='')
 
 
     line_num += 1

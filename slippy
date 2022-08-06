@@ -154,21 +154,19 @@ def performDelete(cmd_info, process):
 
     #---------'d'---------
     if not cmd_info.is_address_found:
-        process.output_line = 'DELETE'
+        process.curr_line_status = 'DELETE'
 
     #---------'nd'---------
     elif single_num:
         if single_num == line_num:
-            process.output_line = None
-        else:
-            process.output_line = line
+            process.curr_line_status = 'DELETE'
+
 
     #---------'/regx/d'---------
     elif single_regex:
         if re.search(single_regex, line):
-            process.output_line = None
-        else:
-            process.output_line = line
+            process.curr_line_status = 'DELETE'
+
 
     #---------'n1,n2d'---------
     elif start_num and end_num:
@@ -351,17 +349,17 @@ for opt, _ in opts:
         option_n = True
 
 
+
 f = open('a', 'r')
 
 line_num = 1
 while True:
 
-    line = sys.stdin.readline()
+    #line = sys.stdin.readline()
     line = f.readline()
     if line == '':
         break
 
-    
 
     #----------update process----------
     process.curr_line = line
@@ -378,22 +376,24 @@ while True:
 
         #----------Execute Print----------
         elif cmd_info.operation == 'p':
-
             cmd_info, process = processPrint(cmd_info, process)
+            process.output_line = process.curr_line
 
-            if process.curr_line_status == 'PRINT':
-                process.output_line = process.curr_line
+            if process.curr_line_status == 'PRINT' and process.curr_line != None:
                 print(process.output_line, end='')
 
             process.curr_line_status = None
 
-
         #----------Execute Delete----------
         elif cmd_info.operation == 'd':
-            cmd_info, process = performDelete(cmd_info, process)
+            process.output_line = process.curr_line
+            if process.curr_line != None:
+                cmd_info, process = performDelete(cmd_info, process)
             if process.curr_line_status == 'DELETE':
+                process.curr_line = None
+                process.output_line = None
                 process.curr_line_status = None
-                continue
+
 
 
          #----------Execute Substitute----------
@@ -404,8 +404,8 @@ while True:
                 print(process.output_line, end='')
 
 
-    if not option_n:
-        print(line, end='')
+    if not option_n and process.output_line != None:
+        print(process.output_line, end='')
 
 
     line_num += 1

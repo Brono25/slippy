@@ -34,9 +34,10 @@ def processQuit(cmd, process):
 
     if not cmd.is_address_found: #slippy 'q' quits line 1
         return True
-        
+
     if number:
         if line_num == number:
+
             return True
     elif regex:
         try:
@@ -395,8 +396,8 @@ while True:
         #----------Execute Quit----------
         if cmd_info.operation == 'q':
             process.output_line = process.curr_line
-            if processQuit(cmd_info, process) and process.curr_line != None:
-                #print(process.output_line, end='')
+            if processQuit(cmd_info, process) and process.curr_line != None and not option_n:
+                print(process.output_line, end='')
                 sys.exit(0)
 
         #----------Execute Print----------

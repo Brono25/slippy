@@ -76,7 +76,7 @@ def processPrint(cmd_info, process):
 
     #---------'/regx/p'---------
     elif single_regex:
-        if re.search(single_regex, line):
+        if line and re.search(single_regex, line):
             process.curr_line_status = 'PRINT'
 
     #---------'n1,n2p'---------
@@ -94,7 +94,7 @@ def processPrint(cmd_info, process):
     #---------'n,/regx/p'---------
     elif start_num and end_regex:
 
-        if re.search(end_regex, line) and cmd_info.begin_flag:
+        if line and re.search(end_regex, line) and cmd_info.begin_flag:
             cmd_info.end_flag = True
             cmd_info.begin_flag = False
             process.curr_line_status = 'PRINT'
@@ -108,8 +108,11 @@ def processPrint(cmd_info, process):
 
     #---------'/regx/,np'---------
     elif start_regex and end_num:
-
-        match = bool(re.search(start_regex, line))
+ 
+        try: #gaurd from deleted lines
+            match = bool(re.search(start_regex, line))
+        except TypeError:
+            match = False
 
         if not cmd_info.begin_flag and match:
             cmd_info.begin_flag = True
@@ -120,15 +123,14 @@ def processPrint(cmd_info, process):
             process.curr_line_status = 'PRINT'
 
 
-
     #---------'/regx1/,/regx2/p'---------
     elif start_regex and end_regex:
 
-        if re.search(end_regex, line) and cmd_info.begin_flag:
+        if line and re.search(end_regex, line) and cmd_info.begin_flag:
             cmd_info.end_flag = True
             process.curr_line_status = 'PRINT'
 
-        if not cmd_info.end_flag and re.search(start_regex, line):
+        if line and not cmd_info.end_flag and re.search(start_regex, line):
             cmd_info.begin_flag = True
 
         if cmd_info.begin_flag and not cmd_info.end_flag:
@@ -143,7 +145,7 @@ def processPrint(cmd_info, process):
 
 
 
-def performDelete(cmd_info, process):
+def processDelete(cmd_info, process):
     """
     Prints the current line if it falls within the bounds
     of an address.
@@ -203,26 +205,37 @@ def performDelete(cmd_info, process):
 
     #---------'/regx/,nd'---------
     elif start_regex and end_num:
-        if line and re.search(start_regex, line) and not cmd_info.regex_flag:
-            cmd_info.regex_flag = True
+ 
+        try: #gaurd from deleted lines
+            match = bool(re.search(start_regex, line))
+        except TypeError:
+            match = False
 
-        if cmd_info.regex_flag and end_num >= line_num:
-            process.output_line = None
-        else:
-            process.output_line = line
+        if not cmd_info.begin_flag and match:
+            cmd_info.begin_flag = True
 
-    #---------'/regx1/,/regx2/d'---------
+        if cmd_info.begin_flag and line_num <= end_num:
+            process.curr_line_status = 'DELETE'
+        elif match:
+            process.curr_line_status = 'DELETE'
+
+
+    #---------'/regx1/,/regx2/p'---------
     elif start_regex and end_regex:
-        if line and re.search(start_regex, line) and not cmd_info.regex_flag:
-            cmd_info.regex_flag = True
-            
-        if cmd_info.regex_flag:
-            process.output_line = None
-        else:
-            process.output_line = line
 
-        if  result := re.search(end_regex, line) and cmd_info.regex_flag:
-            cmd_info.regex_flag = False
+        if line and re.search(end_regex, line) and cmd_info.begin_flag:
+            cmd_info.end_flag = True
+            process.curr_line_status = 'DELETE'
+
+        if line and not cmd_info.end_flag and re.search(start_regex, line):
+            cmd_info.begin_flag = True
+
+        if cmd_info.begin_flag and not cmd_info.end_flag:
+            process.curr_line_status = 'DELETE'
+
+        if line and cmd_info.begin_flag and cmd_info and cmd_info.end_flag:
+            cmd_info.begin_flag = False
+            cmd_info.end_flag = False
 
     return cmd_info, process
 
@@ -405,7 +418,7 @@ while True:
         elif cmd_info.operation == 'd':
             process.output_line = process.curr_line
 
-            cmd_info, process = performDelete(cmd_info, process)
+            cmd_info, process = processDelete(cmd_info, process)
 
             if process.curr_line_status == 'DELETE':
                 process.curr_line = None

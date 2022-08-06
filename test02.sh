@@ -118,7 +118,7 @@ seq 25 | slippy '/ /d'
 seq 25 | slippy '/^2/d'
 seq 25 | slippy '/\//d'
 seq 25 | slippy '/ \ /d'
-seq 25 | slippy '1,20d; /2/d'
+seq 25 | slippy '1,20d; /2/d' #regex on deleted line
 
 seq 25 | slippy -n '/ /d'
 seq 25 | slippy -n  '/^2/d'
@@ -154,6 +154,7 @@ seq 25 | slippy '/\/d'
 
 seq 25 | slippy -n '//d'
 seq 25 | slippy -n '/\/d'
+
 
 ) 2> "$output" 
 
@@ -306,44 +307,87 @@ test_outcome "$output" "$expected_output"
 
 
 
+echo "-------------INVALID /regx/,n d------------"
+(
+seq 25 | slippy  '///,1d'
+seq 25 | slippy  'x,1d'
+seq 25 | slippy  'x,1d'
+seq 25 | slippy  'x,1,d'
+) 2> "$output" 
+
+(
+seq 25 | 2041 slippy  '///,1d'
+seq 25 | 2041 slippy  'x,1d'
+seq 25 | 2041 slippy  'x,1d'
+seq 25 | 2041 slippy  'x,1,d'
+) 2> "$expected_output" 
+
+test_outcome "$output" "$expected_output"
 
 
-# echo "-------------INVALID /regx/,n d------------"
-# (
-# seq 25 | slippy  '///,1d'
-# seq 25 | slippy  'x,1d'
-# seq 25 | slippy  'x,1d'
-# seq 25 | slippy  'x,1,d'
-# ) 2> "$output" 
+echo "-------------VALID /regx/,n d------------"
+(
+seq 25 | slippy  '/1/,2d'
+seq 25 | slippy  '/[0-9]/,1d' 
+seq 25 | slippy  '/1/,100d'
+seq 25 | slippy  '/1/,10d; /2/, 10d; /3/,10d'
+seq 25 | slippy  '1,10d; /2/, 10d;'
+) > "$output" 
 
-# (
-# seq 25 | 2041 slippy  '///,1d'
-# seq 25 | 2041 slippy  'x,1d'
-# seq 25 | 2041 slippy  'x,1d'
-# seq 25 | 2041 slippy  'x,1,d'
-# ) 2> "$expected_output" 
+(
+seq 25 | 2041 slippy  '/1/,2d'
+seq 25 | 2041 slippy  '/[0-9]/,1d' 
+seq 25 | 2041 slippy  '/1/,100d'
+seq 25 | 2041 slippy  '/1/,10d; /2/, 10d; /3/,10d'
+seq 25 | 2041 slippy  '1,10d; /2/, 10d;'
+) > "$expected_output" 
 
-# test_outcome "$output" "$expected_output"
+test_outcome "$output" "$expected_output"
 
 
-# echo "-------------VALID /regx/,n d------------"
-# (
-# seq 25 | slippy  '/1/,1d'
-# seq 25 | slippy  '/[0-9]/,1d' 
-# seq 25 | slippy  '/1/,100d'
-# seq 25 | slippy  '/1/,10d; /2/, 10d; /3/,10d'
 
-# ) > "$output" 
 
-# (
-# seq 25 | 2041 slippy  '/1/,1d'
-# seq 25 | 2041 slippy  '/[0-9]/,1d' 
-# seq 25 | 2041 slippy  '/1/,100d'
-# seq 25 | 2041 slippy  '/1/,10d; /2/, 10d; /3/,10d'
 
-# ) > "$expected_output" 
+echo "-------------INVALID /regx1/,/regx2/ d------------"
+(
+seq 25 | slippy  '///,2d'
+seq 25 | slippy  '//,/ /d' 
+seq 25 | slippy  '/1/,,/2/d'
+seq 25 | slippy  ',/1/,/2/d'
+) 2> "$output" 
 
-# test_outcome "$output" "$expected_output"
+(
+seq 25 | 2041 slippy  '///,2d'
+seq 25 | 2041 slippy  '//,/ /d' 
+seq 25 | 2041 slippy  '/1/,,/2/d'
+seq 25 | 2041 slippy  ',/1/,/2/d'
+
+) 2> "$expected_output" 
+
+test_outcome "$output" "$expected_output"
+
+
+echo "-------------VALID /regx1/,/regx2/ d------------"
+(
+seq 25 | slippy '/1/,/1/d'
+seq 25 | slippy '/1/,/2/d'
+seq 25 | slippy '/./,/2/d'
+seq 25 | slippy '1,10d;/2/,/2/d'
+seq 25 | slippy '/1/,/1/d ; /1/,/1/d'
+) > "$output" 
+
+(
+seq 25 | 2041 slippy '/1/,/1/d'
+seq 25 | 2041 slippy '/1/,/2/d'
+seq 25 | 2041 slippy '/./,/2/d'
+seq 25 | 2041 slippy '1,10d;/2/,/2/d'
+seq 25 | 2041 slippy '/1/,/1/d ; /1/,/1/d'
+
+) > "$expected_output" 
+
+test_outcome "$output" "$expected_output"
+
+
 
 
 

@@ -64,6 +64,7 @@ def processPrint(cmd_info, process):
     line         = process.curr_line
     line_num     = process.curr_line_num
 
+    line_deleted = bool(process.curr_line == None)
 
     #---------'p'---------
     if not cmd_info.is_address_found:
@@ -81,8 +82,15 @@ def processPrint(cmd_info, process):
 
     #---------'n1,n2p'---------
     elif start_num and end_num:
-        if start_num <= line_num <= end_num:
+
+        if start_num == line_num and not line_deleted:
+            cmd_info.begin_flag = True
+
+        if cmd_info.begin_flag and not cmd_info.end_flag:
             process.curr_line_status = 'PRINT'
+
+        if end_num == line_num and cmd_info.begin_flag:
+            cmd_info.end_flag = True
 
     #---------'n,/regx/p'---------
     elif start_num and end_regex:
@@ -152,6 +160,8 @@ def performDelete(cmd_info, process):
     line         = process.curr_line
     line_num     = process.curr_line_num
 
+    line_deleted = bool(process.curr_line == None)
+
     #---------'d'---------
     if not cmd_info.is_address_found:
         process.curr_line_status = 'DELETE'
@@ -161,28 +171,37 @@ def performDelete(cmd_info, process):
         if single_num == line_num:
             process.curr_line_status = 'DELETE'
 
-
     #---------'/regx/d'---------
     elif single_regex:
         if re.search(single_regex, line):
             process.curr_line_status = 'DELETE'
 
-
     #---------'n1,n2d'---------
     elif start_num and end_num:
-        if start_num <= line_num <= end_num:
-            process.output_line = None
-        else:
-            process.output_line = line
+
+        if start_num == line_num and not line_deleted:
+            cmd_info.begin_flag = True
+
+        if cmd_info.begin_flag and not cmd_info.end_flag:
+            process.curr_line_status = 'DELETE'
+
+        if end_num == line_num and cmd_info.begin_flag:
+            cmd_info.end_flag = True
 
     #---------'n,/regx/d'---------
     elif start_num and end_regex:
-        if start_num <= line_num and not cmd_info.regex_flag:
-            process.output_line = None
-            if re.search(end_regex, line):
-                cmd_info.regex_flag = True
-        else:
-            process.output_line = line
+
+        if re.search(end_regex, line) and cmd_info.begin_flag:
+            cmd_info.end_flag = True
+            cmd_info.begin_flag = False
+            process.curr_line_status = 'DELETE'
+
+        if start_num == line_num and not line_deleted:
+            cmd_info.begin_flag = True
+
+        if cmd_info.begin_flag and not cmd_info.end_flag:
+            process.curr_line_status = 'DELETE'
+
 
     #---------'/regx/,nd'---------
     elif start_regex and end_num:
@@ -360,7 +379,6 @@ while True:
     if line == '':
         break
 
-
     #----------update process----------
     process.curr_line = line
     process.curr_line_num = line_num
@@ -370,7 +388,9 @@ while True:
 
         #----------Execute Quit----------
         if cmd_info.operation == 'q':
-            if processQuit(cmd_info, process):
+            process.output_line = process.curr_line
+            if processQuit(cmd_info, process) and process.curr_line != None:
+                print(process.output_line, end='')
                 sys.exit(0)
 
 
@@ -393,7 +413,6 @@ while True:
                 process.curr_line = None
                 process.output_line = None
                 process.curr_line_status = None
-
 
 
          #----------Execute Substitute----------

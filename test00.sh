@@ -206,6 +206,28 @@ test_outcome "$output" "$expected_output"
 
 
 
+echo "-------------MULTIPLE COMMANDS------------"
+(
+seq 25| slippy '1,5d; 3q;' 
+seq 25| slippy '3q; 1,5d;' 
+seq 25| slippy '3d;3q;4d;4q;5q' 
+) > "$output" 
+
+(
+seq 25| 2041 slippy '1,5d; 3q;' 
+seq 25| 2041 slippy '3q; 1,5d;' 
+seq 25| 2041 slippy '3d;3q;4d;4q;5q' 
+) > "$expected_output" 
+
+
+test_outcome "$output" "$expected_output"
+
+
+
+
+
+
+
 cd ..
 rm -rf tmp
 

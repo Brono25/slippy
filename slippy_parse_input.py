@@ -35,12 +35,11 @@ def isValidRegex(pattern, d=r'/'):
 
     unescaped_del_pattern = str(r'[^\\]' + '\\' + d + '|^\\' + d)
 
-    # Check for un-escaped delimeters
-    if re.search(unescaped_del_pattern, pattern):
-        util.printInvalidCommand()
-
-    # Check regex is valid
     try:
+        # Check for un-escaped delimeters
+        if re.search(unescaped_del_pattern, pattern):
+            util.printInvalidCommand()
+        # Check regex is valid
         re.compile(pattern)
     except re.error:
         util.printInvalidCommand()

@@ -160,7 +160,7 @@ def performDelete(cmd_info, process):
     line         = process.curr_line
     line_num     = process.curr_line_num
 
-    line_deleted = bool(process.curr_line == None)
+    #line_deleted = bool(process.curr_line == None)
 
     #---------'d'---------
     if not cmd_info.is_address_found:
@@ -179,7 +179,7 @@ def performDelete(cmd_info, process):
     #---------'n1,n2d'---------
     elif start_num and end_num:
 
-        if start_num == line_num and not line_deleted:
+        if start_num == line_num:
             cmd_info.begin_flag = True
 
         if cmd_info.begin_flag and not cmd_info.end_flag:

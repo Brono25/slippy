@@ -118,7 +118,7 @@ seq 25 | slippy '/ /p'
 seq 25 | slippy '/^2/p'
 seq 25 | slippy '/\//p'
 seq 25 | slippy '/ \ /p'
-seq 25 | slippy '1,20d; /2/p' #regex on deleted line
+seq 25 | slippy '1,20d; /2/p' 
 
 seq 25 | slippy -n '/ /p'
 seq 25 | slippy -n  '/^2/p'
@@ -129,17 +129,17 @@ seq 25 | slippy -n '1,20d; /2/p'
 ) > "$output" 
 
 (
-seq 25 | 2041  slippy '/ /p'
-seq 25 | 2041  slippy '/^2/p'
-seq 25 | 2041  slippy '/\//p'
-seq 25 | 2041  slippy '/ \ /p'
-seq 25 | 2041  slippy '1,20d; /2/p'
+seq 25 | 2041 slippy '/ /p'
+seq 25 | 2041 slippy '/^2/p'
+seq 25 | 2041 slippy '/\//p'
+seq 25 | 2041 slippy '/ \ /p'
+seq 25 | 2041 slippy '1,20d; /2/p' 
 
-seq 25 | 2041  slippy -n   '/ /p'
-seq 25 | 2041  slippy -n  '/^2/p'
-seq 25 | 2041  slippy -n  '/\//p'
-seq 25 | 2041  slippy -n  '/ \ /p'
-seq 25 | 2041  slippy -n '1,20d; /2/p'
+seq 25 | 2041 slippy -n '/ /p'
+seq 25 | 2041 slippy -n  '/^2/p'
+seq 25 | 2041 slippy -n  '/\//p'
+seq 25 | 2041 slippy -n  '/ \ /p'
+seq 25 | 2041 slippy -n '1,20d; /2/p'
 
 ) > "$expected_output" 
 
@@ -266,12 +266,14 @@ seq 25 | slippy  '1,/[0-9]/p'
 seq 25 | slippy  '10,/1/d; 5,/1/p; 1,/^[0-9]$/p'
 seq 25 | slippy  '1, /5/d; 2,/5/p'
 seq 25 | slippy  '1, 10d; 2,/5/p'
+seq 25 | slippy  '1, 10d; 2,/5/p'
 
 seq 25 | slippy  -n '1,/1/p'
 seq 25 | slippy  -n '10,/1/p'
 seq 25 | slippy  -n '1,/[0-9]/p'
 seq 25 | slippy  -n '10,/1/d; 5,/1/p; 1,/^[0-9]$/p'
 seq 25 | slippy  -n '1, /5/d; 2,/5/p'
+seq 25 | slippy  -n '1, 10d; 2,/5/p'
 seq 25 | slippy  -n '1, 10d; 2,/5/p'
 
 ) > "$output" 
@@ -283,12 +285,14 @@ seq 25 | 2041 slippy  '1,/[0-9]/p'
 seq 25 | 2041 slippy  '10,/1/d; 5,/1/p; 1,/^[0-9]$/p'
 seq 25 | 2041 slippy  '1, /5/d; 2,/5/p'
 seq 25 | 2041 slippy  '1, 10d; 2,/5/p'
+seq 25 | 2041 slippy  '1, 10d; 2,/5/p'
 
 seq 25 | 2041 slippy  -n '1,/1/p'
 seq 25 | 2041 slippy  -n '10,/1/p'
 seq 25 | 2041 slippy  -n '1,/[0-9]/p'
 seq 25 | 2041 slippy  -n '10,/1/d; 5,/1/p; 1,/^[0-9]$/p'
 seq 25 | 2041 slippy  -n '1, /5/d; 2,/5/p'
+seq 25 | 2041 slippy  -n '1, 10d; 2,/5/p'
 seq 25 | 2041 slippy  -n '1, 10d; 2,/5/p'
 
 ) > "$expected_output" 

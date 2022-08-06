@@ -99,7 +99,7 @@ def processPrint(cmd_info, process):
             cmd_info.begin_flag = False
             process.curr_line_status = 'PRINT'
 
-        if start_num <= line_num and not cmd_info.end_flag:
+        if line and start_num <= line_num and not cmd_info.end_flag:
             cmd_info.begin_flag = True
 
         if cmd_info.begin_flag and not cmd_info.end_flag:
@@ -286,7 +286,7 @@ def processSubstitute(cmd_info, process):
             process.output_line = re.sub(cmd_info.s_pattern, cmd_info.s_replace, line, g_flag)
 
 
-    #---------'n,/regx/s/a/b/'---------
+     #---------'n,/regx/s/a/b/'---------
     elif start_num and end_regex:
 
         if line and re.search(end_regex, line) and cmd_info.begin_flag:
@@ -294,12 +294,11 @@ def processSubstitute(cmd_info, process):
             cmd_info.begin_flag = False
             process.output_line = re.sub(cmd_info.s_pattern, cmd_info.s_replace, line, g_flag)
 
-        if start_num == line_num:
+        if line and start_num <= line_num and not cmd_info.end_flag:
             cmd_info.begin_flag = True
 
-        if line and cmd_info.begin_flag and not cmd_info.end_flag:
+        if cmd_info.begin_flag and not cmd_info.end_flag:
             process.output_line = re.sub(cmd_info.s_pattern, cmd_info.s_replace, line, g_flag)
-
 
     #---------'/regx/,n s/a/b/'---------
     elif start_regex != None and end_num != None:
@@ -375,13 +374,13 @@ for opt, _ in opts:
 
 
 
-f = open('b', 'r')
+#f = open('b', 'r')
 
 line_num = 1
 while True:
 
-    #line = sys.stdin.readline()
-    line = f.readline()
+    line = sys.stdin.readline()
+    #line = f.readline()
     if line == '':
         break
 
@@ -402,11 +401,12 @@ while True:
         #----------Execute Print----------
         elif cmd_info.operation == 'p':
             cmd_info, process = processPrint(cmd_info, process)
-            process.output_line = process.curr_line
+            
 
             if process.curr_line_status == 'PRINT' and process.curr_line != None:
                 print(process.output_line, end='')
 
+            process.output_line = process.curr_line
             process.curr_line_status = None
 
         #----------Execute Delete----------

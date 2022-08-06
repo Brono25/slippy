@@ -320,6 +320,7 @@ cat input | 2041 slippy  '1,/[0-9]/d'
 cat input | 2041 slippy  '10,/1/d; 5,/1/d; 1,/^[0-9]$/d'
 cat input | 2041 slippy  '1, /5/d; 2,/5/d'
 cat input | 2041 slippy  '1, 10d; 2,/5/d'
+cat input | 2041 slippy  '1, 10d; 2,/./d'
 
 ) > "$expected_output" 
 
@@ -352,6 +353,7 @@ cat input | slippy  '/[0-9]/,1d'
 cat input | slippy  '/1/,100d'
 cat input | slippy  '/1/,10d; /2/, 10d; /3/,10d'
 cat input | slippy  '1,10d; /2/, 10d;'
+cat input | slippy  '1,10d; /./, 10d;'
 ) > "$output" 
 
 (
@@ -360,6 +362,7 @@ cat input | 2041 slippy  '/[0-9]/,1d'
 cat input | 2041 slippy  '/1/,100d'
 cat input | 2041 slippy  '/1/,10d; /2/, 10d; /3/,10d'
 cat input | 2041 slippy  '1,10d; /2/, 10d;'
+cat input | 2041 slippy  '1,10d; /./, 10d;'
 ) > "$expected_output" 
 
 test_outcome "$output" "$expected_output"
@@ -394,6 +397,10 @@ cat input | slippy '/1/,/2/d'
 cat input | slippy '/./,/2/d'
 cat input | slippy '1,10d;/2/,/2/d'
 cat input | slippy '/1/,/1/d ; /1/,/1/d'
+cat input | slippy '/./,/./d'
+cat input | slippy '1,10d; /./,/./d'
+cat input | slippy  '1,10d; /2/, /./d;'
+
 ) > "$output" 
 
 (
@@ -402,6 +409,9 @@ cat input | 2041 slippy '/1/,/2/d'
 cat input | 2041 slippy '/./,/2/d'
 cat input | 2041 slippy '1,10d;/2/,/2/d'
 cat input | 2041 slippy '/1/,/1/d ; /1/,/1/d'
+cat input | 2041 slippy '/./,/./d'
+cat input | 2041 slippy '1,10d; /./,/./d'
+cat input | 2041 slippy  '1,10d; /2/, /./d;'
 
 ) > "$expected_output" 
 

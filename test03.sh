@@ -18,7 +18,7 @@ output="$(mktemp)"
 expected_output="$(mktemp)"
 test_input="$(mktemp)"
 
-trap 'rm -f $output $expected_output $test_input input' EXIT INT
+trap 'rm -f $output $expected_output $test_input ' EXIT INT
 
 
 test_outcome()

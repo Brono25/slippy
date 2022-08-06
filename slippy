@@ -375,13 +375,13 @@ for opt, _ in opts:
 
 
 
-# f = open('b', 'r')
+#f = open('b', 'r')
 
 line_num = 1
 while True:
 
     line = sys.stdin.readline()
-    # line = f.readline()
+    #line = f.readline()
     if line == '':
         break
 

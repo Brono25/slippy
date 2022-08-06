@@ -33,7 +33,9 @@ def isValidRegex(pattern, d=r'/'):
     Slippy regex patterns cannot have un-escaped delimeters.
     """
 
-    unescaped_del_pattern = str(r'[^\\]' + '\\' + d + '|^\\' + d)
+    d = re.escape(d)
+    unescaped_del_pattern = rf'[^\\]{d}|^{d}'
+
 
     try:
         # Check for un-escaped delimeters
@@ -112,6 +114,8 @@ def getAddressInfo(cmd, cmd_info):
 
 
 def getCommandInfo(cmd, cmd_info):
+
+
     if result := re.search(r'^q\s*$', cmd):
         cmd_info.operation = result.group()
 

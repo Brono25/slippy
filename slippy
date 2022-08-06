@@ -375,13 +375,13 @@ for opt, _ in opts:
 
 
 
-#f = open('b', 'r')
+f = open('b', 'r')
 
 line_num = 1
 while True:
 
-    line = sys.stdin.readline()
-    #line = f.readline()
+    #line = sys.stdin.readline()
+    line = f.readline()
     if line == '':
         break
 
@@ -396,7 +396,7 @@ while True:
         if cmd_info.operation == 'q':
             process.output_line = process.curr_line
             if processQuit(cmd_info, process) and process.curr_line != None:
-                print(process.output_line, end='')
+                #print(process.output_line, end='')
                 sys.exit(0)
 
         #----------Execute Print----------

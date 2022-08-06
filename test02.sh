@@ -207,6 +207,26 @@ seq 25 | 2041 slippy '1,1d'
 test_outcome "$output" "$expected_output"
 
 
+echo "-------------OVERLAPPING RANGES n1,n2 [pd]------------"
+(
+seq 25 | slippy '1,5d; 2,10d'
+seq 25 | slippy -n '1,5d; 2,10p'
+seq 25 | slippy -n '1,5p; 2,10d'
+seq 25 | slippy -n '1,5p; 2,10p'
+
+) > "$output" 
+
+(
+seq 25 | 2041 slippy '1,5d; 2,10d'
+seq 25 | 2041 slippy -n '1,5p; 2,10p'
+seq 25 | 2041 slippy -n '1,5d; 2,10p'
+
+) > "$expected_output" 
+
+test_outcome "$output" "$expected_output"
+
+
+
 
 cd ..
 rm -rf tmp

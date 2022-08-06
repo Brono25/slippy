@@ -159,8 +159,6 @@ def performDelete(cmd_info, process):
     line         = process.curr_line
     line_num     = process.curr_line_num
 
-    if line == None:
-        return cmd_info, process
 
     #---------'d'---------
     if not cmd_info.is_address_found:
@@ -173,7 +171,7 @@ def performDelete(cmd_info, process):
 
     #---------'/regx/d'---------
     elif single_regex:
-        if re.search(single_regex, line):
+        if line and re.search(single_regex, line):
             process.curr_line_status = 'DELETE'
 
     #---------'n1,n2d'---------
@@ -191,7 +189,7 @@ def performDelete(cmd_info, process):
     #---------'n,/regx/d'---------
     elif start_num and end_regex:
 
-        if re.search(end_regex, line) and cmd_info.begin_flag:
+        if line and re.search(end_regex, line) and cmd_info.begin_flag:
             cmd_info.end_flag = True
             cmd_info.begin_flag = False
             process.curr_line_status = 'DELETE'
@@ -205,7 +203,7 @@ def performDelete(cmd_info, process):
 
     #---------'/regx/,nd'---------
     elif start_regex and end_num:
-        if re.search(start_regex, line) and not cmd_info.regex_flag:
+        if line and re.search(start_regex, line) and not cmd_info.regex_flag:
             cmd_info.regex_flag = True
 
         if cmd_info.regex_flag and end_num >= line_num:
@@ -215,7 +213,7 @@ def performDelete(cmd_info, process):
 
     #---------'/regx1/,/regx2/d'---------
     elif start_regex and end_regex:
-        if re.search(start_regex, line) and not cmd_info.regex_flag:
+        if line and re.search(start_regex, line) and not cmd_info.regex_flag:
             cmd_info.regex_flag = True
             
         if cmd_info.regex_flag:
@@ -369,13 +367,13 @@ for opt, _ in opts:
 
 
 
-f = open('b', 'r')
+#f = open('b', 'r')
 
 line_num = 1
 while True:
 
-    #line = sys.stdin.readline()
-    line = f.readline()
+    line = sys.stdin.readline()
+    #line = f.readline()
     if line == '':
         break
 

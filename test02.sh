@@ -280,6 +280,7 @@ seq 25 | 2041 slippy  '/x/,1,d'
 test_outcome "$output" "$expected_output"
 
 
+
 echo "-------------VALID n, /regx/ d------------"
 (
 seq 25 | slippy  '1,/1/d'
@@ -296,6 +297,8 @@ seq 25 | 2041 slippy  '1,/1/d'
 seq 25 | 2041 slippy  '10,/1/d'
 seq 25 | 2041 slippy  '1,/[0-9]/d'
 seq 25 | 2041 slippy  '10,/1/d; 5,/1/d; 1,/^[0-9]$/d'
+seq 25 | 2041 slippy  '1, /5/d; 2,/5/d'
+seq 25 | 2041 slippy  '1, 10d; 2,/5/d'
 
 ) > "$expected_output" 
 
@@ -305,42 +308,42 @@ test_outcome "$output" "$expected_output"
 
 
 
-echo "-------------INVALID /regx/,n d------------"
-(
-seq 25 | slippy  '///,1d'
-seq 25 | slippy  'x,1d'
-seq 25 | slippy  'x,1d'
-seq 25 | slippy  'x,1,d'
-) 2> "$output" 
+# echo "-------------INVALID /regx/,n d------------"
+# (
+# seq 25 | slippy  '///,1d'
+# seq 25 | slippy  'x,1d'
+# seq 25 | slippy  'x,1d'
+# seq 25 | slippy  'x,1,d'
+# ) 2> "$output" 
 
-(
-seq 25 | 2041 slippy  '///,1d'
-seq 25 | 2041 slippy  'x,1d'
-seq 25 | 2041 slippy  'x,1d'
-seq 25 | 2041 slippy  'x,1,d'
-) 2> "$expected_output" 
+# (
+# seq 25 | 2041 slippy  '///,1d'
+# seq 25 | 2041 slippy  'x,1d'
+# seq 25 | 2041 slippy  'x,1d'
+# seq 25 | 2041 slippy  'x,1,d'
+# ) 2> "$expected_output" 
 
-test_outcome "$output" "$expected_output"
+# test_outcome "$output" "$expected_output"
 
 
-echo "-------------VALID /regx/,n d------------"
-(
-seq 25 | slippy  '/1/,1d'
-seq 25 | slippy  '/[0-9]/,1d' 
-seq 25 | slippy  '/1/,100d'
-seq 25 | slippy  '/1/,10d; /2/, 10d; /3/,10d'
+# echo "-------------VALID /regx/,n d------------"
+# (
+# seq 25 | slippy  '/1/,1d'
+# seq 25 | slippy  '/[0-9]/,1d' 
+# seq 25 | slippy  '/1/,100d'
+# seq 25 | slippy  '/1/,10d; /2/, 10d; /3/,10d'
 
-) > "$output" 
+# ) > "$output" 
 
-(
-seq 25 | 2041 slippy  '/1/,1d'
-seq 25 | 2041 slippy  '/[0-9]/,1d' 
-seq 25 | 2041 slippy  '/1/,100d'
-seq 25 | 2041 slippy  '/1/,10d; /2/, 10d; /3/,10d'
+# (
+# seq 25 | 2041 slippy  '/1/,1d'
+# seq 25 | 2041 slippy  '/[0-9]/,1d' 
+# seq 25 | 2041 slippy  '/1/,100d'
+# seq 25 | 2041 slippy  '/1/,10d; /2/, 10d; /3/,10d'
 
-) > "$expected_output" 
+# ) > "$expected_output" 
 
-test_outcome "$output" "$expected_output"
+# test_outcome "$output" "$expected_output"
 
 
 

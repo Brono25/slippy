@@ -331,8 +331,8 @@ try:
 except getopt.GetoptError:
     util.printUsage()
 
-#if len(args) != 1:
-    #util.printError()
+if len(args) != 1:
+    util.printError()
 
 
 input_cmd = args[0]
@@ -356,8 +356,8 @@ f = open('a', 'r')
 line_num = 1
 while True:
 
-    #line = sys.stdin.readline()
-    line = f.readline()
+    line = sys.stdin.readline()
+    #line = f.readline()
     if line == '':
         break
 

@@ -99,32 +99,37 @@ def processPrint(cmd_info, process):
             process.curr_line_status = 'PRINT'
 
 
-
-
-
     #---------'/regx/,np'---------
     elif start_regex and end_num:
-        if re.search(start_regex, line) and not cmd_info.regex_flag:
-            cmd_info.regex_flag = True
 
-        if cmd_info.regex_flag and end_num >= line_num:
-            process.output_line = line
-        else:
-            process.output_line = None
+        match = bool(re.search(start_regex, line))
+
+        if not cmd_info.begin_flag and match:
+            cmd_info.begin_flag = True
+
+        if cmd_info.begin_flag and line_num <= end_num:
+            process.curr_line_status = 'PRINT'
+        elif match:
+            process.curr_line_status = 'PRINT'
+
+
 
     #---------'/regx1/,/regx2/p'---------
     elif start_regex and end_regex:
-        if re.search(start_regex, line) and not cmd_info.regex_flag:
-            cmd_info.regex_flag = True
-            
-        if cmd_info.regex_flag:
-            process.output_line = line
-        else:
-            process.output_line = None
 
-        if  result := re.search(end_regex, line) and cmd_info.regex_flag:
-            cmd_info.regex_flag = False
+        if re.search(end_regex, line) and cmd_info.begin_flag:
+            cmd_info.end_flag = True
+            process.curr_line_status = 'PRINT'
 
+        if not cmd_info.end_flag and re.search(start_regex, line):
+            cmd_info.begin_flag = True
+
+        if cmd_info.begin_flag and not cmd_info.end_flag:
+            process.curr_line_status = 'PRINT'
+
+        if cmd_info.begin_flag and cmd_info and cmd_info.end_flag:
+            cmd_info.begin_flag = False
+            cmd_info.end_flag = False
 
     return cmd_info, process
 

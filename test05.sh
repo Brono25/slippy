@@ -4,7 +4,7 @@
 # ==============================================================================
 # test05.sh
 #
-# Testing slippy multiple commands in files
+# Testing slippy multiple commands in files and input files
 # ==============================================================================
 
 

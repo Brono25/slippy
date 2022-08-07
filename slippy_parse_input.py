@@ -39,7 +39,6 @@ def isValidRegex(pattern, d=r'/'):
     d = re.escape(d)
     unescaped_del_pattern = rf'[^\\]{d}|^{d}'
 
-
     try:
         # Check for un-escaped delimeters
         if re.search(unescaped_del_pattern, pattern):
@@ -47,6 +46,9 @@ def isValidRegex(pattern, d=r'/'):
         # Check regex is valid
         re.compile(re.escape(pattern))
     except re.error:
+        util.printInvalidCommand()
+
+    if re.search(r'^\\$', pattern):
         util.printInvalidCommand()
 
     return pattern

@@ -427,19 +427,19 @@ for opt, _ in opts:
 
 
 
-#f = open('b', 'r')
+f = open('b', 'r')
 
 
 curr_line = None
 next_line = sys.stdin.readline()
-# next_line = f.readline()
+#next_line = f.readline()
 
 line_num = 1
 while True:
 
     curr_line = next_line
     next_line = sys.stdin.readline()
-    # next_line = f.readline()
+    #next_line = f.readline()
 
 
     if curr_line == '':
@@ -495,11 +495,9 @@ while True:
 
          #----------Execute Substitute----------
         elif cmd_info.operation == 's':
-
-            process.output_line = curr_line
-            cmd_info, process = processSubstitute(cmd_info, process)
-            process.curr_line = process.output_line
-
+            process.output_line = process.curr_line
+            if process.output_line != None:
+                cmd_info, process = processSubstitute(cmd_info, process)
 
 
     if not option_n and process.output_line != None:

@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 
-import slippy_debugging_tools as debug
 
 import re
 import slippy_utility as util
 
 
+
+#------------------------------------------
+#            PARSE DEFINE
+#------------------------------------------
+
+#holds the information of one command 
 class Command:
     def __init__(self):
         self.operation        = None  # q,p,d,s
@@ -15,11 +20,11 @@ class Command:
         # address info
         self.is_address_found = False
         self.single_num       = None
-        self.single_regex    = None
+        self.single_regex     = None
         self.start_num        = None
-        self.start_regex     = None
+        self.start_regex      = None
         self.end_num          = None
-        self.end_regex       = None
+        self.end_regex        = None
         self.full_address     = None
         # subs info
         self.s_pattern        = None
@@ -27,10 +32,15 @@ class Command:
         self.s_global_flag    = 1
 
 
+
+#------------------------------------------
+#            PARSE FUNCTIONS
+#------------------------------------------
+
 def isValidRegex(pattern, d=r'/'):
     """
     Checks if a regex pattern is valid.
-    Slippy regex patterns cannot have un-escaped delimeters.
+    If unescaped delimiters found error.
     """
 
     d = re.escape(d)
@@ -52,7 +62,10 @@ def isValidRegex(pattern, d=r'/'):
 
 
 def isValidNumber(num):
-
+    """
+    Valid address numbers are positive integers
+    or a $ indicating last line of a file.
+    """
     if num != r'$' and int(num) == 0:
         util.printInvalidCommand()
 
@@ -64,16 +77,18 @@ def isValidNumber(num):
 
 def getAddressInfo(cmd, cmd_info):
     """
-    Retreive the address for a given slippy command
+    Parse the address bounds of a slippy command.
+    Parsed commands are stored in cmd_info class.
+    Can parse addresses containing commas or semicolons.
     """
-    n = r'(?:\d+|\$)'
-    no_adrr = r'^[qpds]'
-    single_num = rf'(^({n})\s*)[qpds]'
+    n           = r'(?:\d+|\$)' #numbers or $ can be addresses
+    no_adrr     = r'^[qpds]'
+    single_num  = rf'(^({n})\s*)[qpds]'
     single_regx = r'(^/(.+)/\s*)[qpds]'
-    regx_regx = r'(^/(.+)/\s*,\s*/(.+)/\s*)[pds]'
-    regx_num = rf'(^/(.+)/\s*,\s*({n})\s*)[pds]'
-    num_regx = rf'(^({n})\s*,\s*/(.+)/\s*)[pds]'
-    num_num = rf'(^({n})\s*,\s*({n})\s*)[pds]'
+    regx_regx   = r'(^/(.+)/\s*,\s*/(.+)/\s*)[pds]'
+    regx_num    = rf'(^/(.+)/\s*,\s*({n})\s*)[pds]'
+    num_regx    = rf'(^({n})\s*,\s*/(.+)/\s*)[pds]'
+    num_num     = rf'(^({n})\s*,\s*({n})\s*)[pds]'
 
 
 
@@ -105,9 +120,8 @@ def getAddressInfo(cmd, cmd_info):
         cmd_info.is_address_found = True
         if cmd_info.end_num != r'$' and cmd_info.start_num != r'$':
 
-            if cmd_info.end_num < cmd_info.start_num:
+            if cmd_info.end_num < cmd_info.start_num: 
                 cmd_info.end_num = cmd_info.start_num
-
 
     elif result := re.search(single_num, cmd):
         cmd_info.full_address = result.group(1)
@@ -128,9 +142,14 @@ def getAddressInfo(cmd, cmd_info):
 
 
 
-def parsePatternReplace(sub_input):
+def parseSubsCommmand(sub_input):
 
-    d = sub_input[1]
+    """
+    Takes in a substitute command string 's/patt/repl/g'
+    and parses the pattern and replacement strings.
+    Can parse patterns with escaped delimeters.
+    """
+    d = sub_input[1] #delimeter
     sub_input = sub_input[2:]
 
     delim_count = 1
@@ -140,8 +159,6 @@ def parsePatternReplace(sub_input):
     repl = ''
     flag = ''
     escape_found = False
-
-
 
     for c in sub_input:
 
@@ -176,8 +193,6 @@ def parsePatternReplace(sub_input):
     repl = repl[1:].replace(fr'\{d}', d)
     flag = flag[1:].strip()
 
-
-
     if flag and flag != 'g':
         util.printInvalidCommand()
 
@@ -191,6 +206,11 @@ def parsePatternReplace(sub_input):
 
 
 def getCommandInfo(cmd, cmd_info):
+    """
+    Seperate the qpds commands.
+    If s command parse the patterna and replace arguments.
+    Return fully parsed commands in cmd_info
+    """
 
     if result := re.search(r'^q\s*$', cmd):
         cmd_info.operation = result.group()
@@ -210,7 +230,7 @@ def getCommandInfo(cmd, cmd_info):
     # parse substitute operation
     if cmd_info.operation == 's':
 
-        patt, repl, flag = parsePatternReplace(cmd)
+        patt, repl, flag = parseSubsCommmand(cmd)
         cmd_info.s_pattern = patt
         cmd_info.s_replace = repl
         cmd_info.s_global_flag = flag
@@ -220,9 +240,8 @@ def getCommandInfo(cmd, cmd_info):
 
 def nthGreedyMatch(n, string, sep=';'):
     """
-    Returns a subset of string from the start to the the 'nth' seperator ';'.
-    Duplicates in a row are counted as one
-    i.e nthGreedyMatch(3, '; a ;; b ;;; c ;;;; d') = '; a ;; b ;;; c'
+    Returns a subset of string from the start to the the 'nth' seperator ';|\n'.
+    Duplicates seperators in a row are stripped to one remaining.
     """
     sep_count = 0
     match = ''
@@ -240,20 +259,19 @@ def nthGreedyMatch(n, string, sep=';'):
     return string
 
 
-# Parses commands by looking at a section of the input command string up until a seperator ';' is found.
+# Parses commands by looking at a section of the input command string up until a seperator ';|\n' is found.
 # The section is then compared with valid input commands and if none are found the input command
-# string is then searched up until the second ';' and then repeated. If the end of the command string
+# string is then searched up until the second ';|\n' and then repeated. If the end of the command string
 # is reached with no valid commands found then it is an invalid command.
 # If a valid command is found then the valid command is stripped from the input command string
 # and the process starts again.
 
 def parseCommands(cmd_list):
     """
-    Takes in a list of commands seperated by ';' and seperates them into a list.
-    If one command is invalid the program errors.
+    Takes in a list of commands seperated by ';' or newlines and seperates them into a list
+    of unparsed commands.
+    Can parse commands with patterns containing ';'
     """
-
-
 
     RESET_NTH_GREEDY = 1
 
@@ -388,6 +406,9 @@ def parseCommands(cmd_list):
 
     return commands
 
+#------------------------------------------
+#               PARSE MAIN
+#------------------------------------------
 
 def parseInput(slippy_input):
 
@@ -417,3 +438,8 @@ def parseInput(slippy_input):
 
 
     return executable_cmds
+
+
+
+
+

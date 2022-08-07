@@ -1,13 +1,21 @@
 #!/usr/bin/env python3
 
 
-import slippy_debugging_tools as debug
 import sys, re
 import slippy_utility as util
 import slippy_parse_input as parse
 from os.path import exists
 import argparse
 
+
+
+#------------------------------------------
+#                DEFINE
+#------------------------------------------
+
+
+# Process class stores the current place
+# a file or stdin is being processed
 class Process:
     def __init__(self):
         self.curr_line        = None
@@ -25,7 +33,7 @@ class Process:
 
 def processQuit(cmd, process):
     """
-    Exits program at provided address
+    Determines if current line should exit.
     """
     number   = cmd.single_num
     regex    = cmd.single_regex
@@ -48,11 +56,12 @@ def processQuit(cmd, process):
     return False
 
 
-
+#cmd_info is passed into the process functions and is returned.
+#cmd_info can track address end and beginnings with end and begin flags inside it.
 def processPrint(cmd_info, process):
     """
     Prints the current line if it falls within the bounds
-    of an address.
+    of a line address.
     """
 
     line         = process.output_line
@@ -62,10 +71,10 @@ def processPrint(cmd_info, process):
     start_regex  = cmd_info.start_regex
     end_regex    = cmd_info.end_regex
 
-    # If a num address is $, assign it a +1 line number for the duration
-    # of this function. This allows dealing with only ints in setting flags
-    # of address matching. Once EOF is reached $ will be assigned a line number
-    # and this gaurd will be ignored.
+    #This converts a $ address into an int of the 
+    #next future address. The $ will always be put into
+    #the future until EOF is reached.
+    #This allows using just ints for address matching.
     if cmd_info.single_num == r'$':
         single_num = line_num + 1
     else:
@@ -165,8 +174,7 @@ def processPrint(cmd_info, process):
 
 def processDelete(cmd_info, process):
     """
-    Prints the current line if it falls within the bounds
-    of an address.
+    Deletes a line if it falls within the bounds of an address.
     """
 
     line         = process.curr_line
@@ -176,10 +184,7 @@ def processDelete(cmd_info, process):
     start_regex  = cmd_info.start_regex
     end_regex    = cmd_info.end_regex
 
-    #If a num address is $, assign it a +1 line number for the duration
-    #of this function. This allows dealing with only ints in setting flags
-    #of address matching. Once EOF is reached $ will be assigned a line number
-    # and this gaurd will be ignored.
+    #Gaurd $ addresses
     if cmd_info.single_num == r'$':
         single_num = line_num + 1
     else:
@@ -278,7 +283,7 @@ def processDelete(cmd_info, process):
 
 def processSubstitute(cmd_info, process):
     """
-    Prints the current line if it falls within the bounds
+    performas subsititue on a line if it falls within the bounds
     of an address.
     """
 
@@ -291,10 +296,7 @@ def processSubstitute(cmd_info, process):
 
     g_flag       = cmd_info.s_global_flag
 
-    # If a num address is $, assign it a +1 line number for the duration
-    # of this function. This allows dealing with only ints in setting flags
-    # of address matching. Once EOF is reached $ will be assigned a line number
-    # and this gaurd will be ignored.
+   #Gaurd $ addresses
     if cmd_info.single_num == r'$':
         single_num = line_num + 1
     else:
@@ -391,8 +393,11 @@ def processSubstitute(cmd_info, process):
 
 
 def parseAllCommands(input_cmd, scripts_cmds):
-
-
+    """
+    Parses commands from either argv or -f files.
+    Parsed commands are entered into a list of a Command class.
+    Each element in the list contains one commands information.
+    """
     cmds = list()
     #parse command line first
     if input_cmd:
@@ -407,7 +412,6 @@ def parseAllCommands(input_cmd, scripts_cmds):
             with open(script, 'r') as s:
                 for line in s.readlines():
                     cmds += parse.parseInput(line)
-
 
     return cmds
 
@@ -432,6 +436,7 @@ if args.input_cmd == None and args.option_f == None:
 option_n  = args.option_n
 option_i  = args.option_i
 
+
 #extract input files into list
 input_files = list()
 if args.input_cmd and args.option_f:
@@ -443,19 +448,21 @@ elif args.files:
     for f in args.files:
         input_files.append(f)
 
+
 if args.input_cmd:
     input_cmd = args.input_cmd
+
 
 #create list of command scripts then parse them all
 cmd_scripts = list()
 if args.option_f:
     for f in args.option_f:
         cmd_scripts += f
-cmds  = parseAllCommands(args.input_cmd, cmd_scripts)
 
 
 
-process   = Process() #holds info of the current command executions
+cmds    = parseAllCommands(args.input_cmd, cmd_scripts)
+process = Process()
 
 #preload next_line buffer
 if len(input_files):
@@ -471,9 +478,14 @@ else:
     curr_line = None
     next_line = sys.stdin.readline()
 
+
+
 eof_last_file = False
 line_num = 1
+
 while True:
+
+
 
     # ----------open files and handle exits----------
     # if eof is reached close file and open next file else end
@@ -500,7 +512,7 @@ while True:
         eof_last_file = True
 
 
-    #----------read files----------
+    #----------Load buffers from file/stdin----------
     if input_files:
         curr_line = next_line
         next_line = input_file.readline()
@@ -514,7 +526,7 @@ while True:
     process.next_line     = next_line
 
 
-    #execute commands on current line
+    #execute all commands sequentially on current line
     for cmd_info in cmds:
 
         #look for file end to update $ addr
@@ -525,6 +537,7 @@ while True:
                 cmd_info.start_num  = line_num
             if cmd_info.end_num == r'$':
                 cmd_info.end_num    = line_num
+
 
         #----------Execute Quit----------
         if cmd_info.operation == 'q':
@@ -548,6 +561,7 @@ while True:
 
             process.curr_line_status = None
 
+
         #----------Execute Delete----------
         elif cmd_info.operation == 'd':
             process.output_line = process.curr_line
@@ -560,6 +574,7 @@ while True:
                 process.curr_line_status = None
 
 
+
          #----------Execute Substitute----------
         elif cmd_info.operation == 's':
 
@@ -567,10 +582,11 @@ while True:
             cmd_info, process = processSubstitute(cmd_info, process)
             process.curr_line = process.output_line
 
+
+
+
     if not option_n and process.output_line != None:
         print(process.output_line, end='')
-
-
 
     line_num += 1
 

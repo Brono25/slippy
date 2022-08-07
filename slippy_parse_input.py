@@ -20,9 +20,6 @@ class Command:
         self.start_regex     = None
         self.end_num          = None
         self.end_regex       = None
-        self.single_doll      = False
-        self.end_doll         = False
-        self.beg_doll         = False
         self.full_address     = None
         # subs info
         self.s_pattern        = None

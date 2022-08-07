@@ -8,23 +8,24 @@ import slippy_utility as util
 
 class Command:
     def __init__(self):
-        self.operation = None  # q,p,d,s
-        self.end_flag = False
-        self.begin_flag = False
+        self.operation        = None  # q,p,d,s
+        self.end_flag         = False #used during processing
+        self.begin_flag       = False #to keep track of line matching
 
         # address info
         self.is_address_found = False
-        self.single_num = None
-        self.single_regexp = None
-        self.start_num = None
-        self.start_regexp = None
-        self.end_num = None
-        self.end_regexp = None
-        self.full_address = None
+        self.is_dollar_sign   = False
+        self.single_num       = None
+        self.single_regexp    = None
+        self.start_num        = None
+        self.start_regexp     = None
+        self.end_num          = None
+        self.end_regexp       = None
+        self.full_address     = None
         # subs info
-        self.s_pattern = None
-        self.s_replace = None
-        self.s_global_flag = 1
+        self.s_pattern        = None
+        self.s_replace        = None
+        self.s_global_flag    = 1
 
 
 def isValidRegex(pattern, d=r'/'):
@@ -62,7 +63,7 @@ def getAddressInfo(cmd, cmd_info):
     """
 
     no_adrr = r'^[qpds]'
-    single_num = r'(^(\d+)\s*)[qpds]'
+    single_num = r'(^(\d+|[$]{1})\s*)[qpds]'
     single_regx = r'(^/(.+)/\s*)[qpds]'
     regx_regx = r'(^/(.+)/\s*,\s*/(.+)/\s*)[pds]'
     regx_num = r'(^/(.+)/\s*,\s*(\d+)\s*)[pds]'

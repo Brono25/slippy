@@ -155,25 +155,54 @@ test_outcome "$output" "$expected_output"
 
 
 
-echo "-------------Several Command Scripts------------"
-echo '1p' > s1
-echo '3p' > s2
-(
-cat input | slippy -f s1 -f s2
-cat - <<'eof' > script3
-
+echo "-------------Multiple Input Files------------"
+seq 10 > file1
+cat - <<eof > file2
+line 1
+line 2
+line 3
 eof
+seq 101 99  1000 > file3
 
+(
+cat input | slippy -n 'p' file1 file2 file3
+cat input | slippy  '3,5d' file1 file2 file3
+cat input | slippy  '/2/,/5/ s/2./x/' file1 file2 file3
 
 ) > "$output" 
 
 (
-cat input | 2041 slippy -f s1 -f s2
-
+cat input | 2041 slippy -n 'p' file1 file2 file3
+cat input | 2041 slippy  '3,5d' file1 file2 file3
+cat input | 2041 slippy  '/2/,/5/ s/2./x/' file1 file2 file3
 ) > "$expected_output" 
 
 test_outcome "$output" "$expected_output"
 
+
+
+echo "-------------Multiple Input Files with $ addresses------------"
+
+(
+cat input | slippy -n '$p' file1 file2 file3
+cat input | slippy  '3,$d' file1 file2 file3
+cat input | slippy  '/2/,$ s/2./x/' file1 file2 file3
+cat input | slippy  '$,$ p' file1 file2 file3
+cat input | slippy  '$,$ d' file1 file2 file3
+cat input | slippy  '$,1/ s/./x/' file1 file2 file3
+
+) > "$output" 
+
+(
+cat input | 2041 slippy -n '$p' file1 file2 file3
+cat input | 2041 slippy  '3,$d' file1 file2 file3
+cat input | 2041 slippy  '/2/,$ s/2./x/' file1 file2 file3
+cat input | 2041 slippy  '$,$ p' file1 file2 file3
+cat input | 2041 slippy  '$,$ d' file1 file2 file3
+cat input | 2041 slippy  '$,1/ s/./x/' file1 file2 file3
+) > "$expected_output" 
+
+test_outcome "$output" "$expected_output"
 
 
 

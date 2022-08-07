@@ -390,7 +390,7 @@ def processSubstitute(cmd_info, process):
 
 
 
-def commandsFromScripts(script):
+def getAllCommands(input_cmd, scripts_cmds):
     pass
 
 
@@ -431,8 +431,13 @@ if args.files:
 
 
 input_cmd = args.input_cmd
+
+
+
 cmds  = parse.parseInput(input_cmd)
 
+print(cmds)
+sys.exit(0)
 option_n  = args.option_n
 option_i  = args.option_i
 

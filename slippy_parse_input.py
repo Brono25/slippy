@@ -176,15 +176,15 @@ def parsePatternReplace(sub_input):
     repl = repl[1:].replace(fr'\{d}', d)
     flag = flag[1:]
 
-    
+
 
     if flag and flag != 'g':
         util.printInvalidCommand()
 
     if flag == 'g':
-        flag = 1
-    else:
         flag = 0
+    else:
+        flag = 1
 
     return patt, repl, flag
 

@@ -434,7 +434,7 @@ option_i  = args.option_i
 
 #extract input files into list
 input_files = list()
-if args.files and args.option_f:
+if args.input_cmd and args.option_f:
     for f in args.files:
         input_files.append(f)
     input_files.insert(0, args.input_cmd)

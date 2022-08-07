@@ -176,7 +176,7 @@ def parsePatternReplace(sub_input):
     repl = repl[1:].replace(fr'\{d}', d)
     flag = flag[1:]
 
-    print(repl, patt)
+    
 
     if flag and flag != 'g':
         util.printInvalidCommand()

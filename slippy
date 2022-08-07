@@ -281,7 +281,7 @@ def processSubstitute(cmd_info, process):
     Prints the current line if it falls within the bounds
     of an address.
     """
-    breakpoint()
+
     line         = process.output_line
     line_num     = process.curr_line_num
 

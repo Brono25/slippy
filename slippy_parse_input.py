@@ -142,6 +142,7 @@ def parsePatternReplace(sub_input):
     escape_found = False
 
 
+
     for c in sub_input:
 
         if c == '\\':
@@ -171,10 +172,11 @@ def parsePatternReplace(sub_input):
 
             util.printInvalidCommand()
 
-
     patt = patt.strip()
-    repl = repl[1:]
+    repl = repl[1:].replace(fr'\{d}', d)
     flag = flag[1:]
+
+    print(repl, patt)
 
     if flag and flag != 'g':
         util.printInvalidCommand()

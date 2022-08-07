@@ -378,16 +378,18 @@ for opt, _ in opts:
 
 #f = open('b', 'r')
 
-line_num = 1
+line_num = 0
 while True:
 
-    line = sys.stdin.readline()
-    #line = f.readline()
-    if line == '':
+    curr_line = None
+    next_line = sys.stdin.readline()
+
+    #curr_line = f.readline()
+    if curr_line == '':
         break
 
     #----------update process----------
-    process.curr_line = line
+    process.curr_line = curr_line
     process.curr_line_num = line_num
 
     #execute commands on current line

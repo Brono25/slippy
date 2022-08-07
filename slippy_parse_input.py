@@ -336,7 +336,7 @@ def parseCommands(cmd_list):
             commands.append(trim_cmd)
 
             nth_greedy = RESET_NTH_GREEDY
-
+        #ignore lines of just comments
         elif re.search(comment_line, parsed_sc.strip()) or re.search(comment_line,parsed_nl.strip()):
             cmd_list = ''
             pass

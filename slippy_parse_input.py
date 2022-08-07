@@ -126,6 +126,68 @@ def getAddressInfo(cmd, cmd_info):
     return cmd_info
 
 
+
+
+def parsePatternReplace(sub_input):
+
+    d = sub_input[1]
+    sub_input = sub_input[2:]
+
+    delim_count = 1
+
+    #find pattern
+    patt = ''
+    repl = ''
+    flag = ''
+    escape_found = False
+
+
+    for c in sub_input:
+
+        if c == '\\':
+
+            escape_found = True
+
+            if delim_count == 1:
+                patt += c
+            if delim_count == 2:
+                repl += c
+            if delim_count == 3:
+                flag += c
+            continue
+
+        if not escape_found and c == d:
+            delim_count += 1
+
+        escape_found = False
+        if delim_count == 1:
+                patt += c
+        if delim_count == 2:
+                repl += c
+        if delim_count == 3:
+            flag += c
+
+        if delim_count >= 4:
+
+            util.printInvalidCommand()
+
+
+    patt = patt.strip()
+    repl = repl[1:]
+    flag = flag[1:]
+
+    if flag and flag != 'g':
+        util.printInvalidCommand()
+
+    if flag == 'g':
+        flag = 1
+    else:
+        flag = 0
+
+    return patt, repl, flag
+
+
+
 def getCommandInfo(cmd, cmd_info):
 
     if result := re.search(r'^q\s*$', cmd):
@@ -146,35 +208,10 @@ def getCommandInfo(cmd, cmd_info):
     # parse substitute operation
     if cmd_info.operation == 's':
 
-        try:
-            d = re.escape(cmd[1])  # delimeter is first character after 's'
-
-        except IndexError:
-            util.printInvalidCommand()
-
-        s_pattern = '^s' + d + r'(.+)' + d + r'(.*)' + d + r'(.*)$'
-
-        if result := re.search(s_pattern, cmd):
-
-            cmd_info.s_replace = isValidRegex(result.group(2), d)
-            cmd_info.s_pattern = isValidRegex(result.group(1), d)
-            try:
-                #pattern gets one extra check
-                re.compile(cmd_info.s_pattern)
-            except re.error:
-                util.printInvalidCommand()
-
-
-            if result.group(3).strip() == 'g':
-                cmd_info.s_global_flag = 0
-
-            elif result.group(3) == '':
-                pass
-            else:
-                util.printInvalidCommand()
-
-        else:
-            util.printInvalidCommand()
+        patt, repl, flag = parsePatternReplace(cmd)
+        cmd_info.s_pattern = patt
+        cmd_info.s_replace = repl
+        cmd_info.s_global_flag = flag
 
     return cmd_info
 

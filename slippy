@@ -392,6 +392,7 @@ def processSubstitute(cmd_info, process):
 
 def parseAllCommands(input_cmd, scripts_cmds):
 
+
     cmds = list()
     #parse command line first
     if input_cmd:
@@ -430,7 +431,6 @@ if args.input_cmd == None and args.option_f == None:
 
 option_n  = args.option_n
 option_i  = args.option_i
-
 
 #extract input files into list
 input_files = list()

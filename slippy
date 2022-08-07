@@ -432,17 +432,16 @@ option_n  = args.option_n
 option_i  = args.option_i
 
 
-
 #extract input files into list
 input_files = list()
 if args.files and args.option_f:
     for f in args.files:
-        input_files += f
+        input_files.append(f)
     input_files.insert(0, args.input_cmd)
     args.input_cmd = None
 elif args.files:
     for f in args.files:
-        input_files += f
+        input_files.append(f)
 
 if args.input_cmd:
     input_cmd = args.input_cmd
@@ -462,11 +461,8 @@ process   = Process() #holds info of the current command executions
 if len(input_files):
     num_files = len(input_files)
     f_ind = 0
-
-
     if not exists(input_files[f_ind]):
         util.printError()
-
 
     input_file = open(input_files[f_ind], 'r')
     curr_line = None

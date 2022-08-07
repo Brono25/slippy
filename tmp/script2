@@ -1,0 +1,11 @@
+
+1,10p; #comment 1
+
+#comment 2
+
+5, $ s/[5]/x/g ;; #comment 3;; #comment 4
+
+/./,/./p
+/./,$ s/./y/
+14q
+#comment 5

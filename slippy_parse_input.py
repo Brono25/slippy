@@ -89,7 +89,7 @@ def getAddressInfo(cmd, cmd_info):
     elif result := re.search(regx_num, cmd):
         cmd_info.full_address = result.group(1)
         cmd_info.start_regex = isValidRegex(result.group(2))
-        cmd_info.end_num = isValidNumber(int(result.group(3)))
+        cmd_info.end_num = isValidNumber(result.group(3))
         cmd_info.is_address_found = True
 
     elif result := re.search(num_regx, cmd):

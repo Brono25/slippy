@@ -5,7 +5,7 @@ import slippy_debugging_tools as debug
 import sys, re
 import slippy_utility as util
 import slippy_parse_input as parse
-import getopt
+from os.path import exists
 import argparse
 
 class Process:
@@ -443,6 +443,8 @@ process   = Process() #holds info of the current command executions
 if input_files:
     num_files = len(input_files)
     f_ind = 0
+    if not exists(input_files[f_ind]):
+        util.printError()
     input_file = open(input_files[f_ind], 'r')
     curr_line = None
     next_line = input_file.readline()
@@ -460,6 +462,8 @@ while True:
         input_file.close()
         f_ind += 1
         if f_ind < num_files:
+            if not exists(input_files[f_ind]):
+                util.printError()
             input_file = open(input_files[f_ind], 'r')
             next_line = input_file.readline()
         else:

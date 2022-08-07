@@ -32,7 +32,7 @@ def isValidRegex(pattern, d=r'/'):
     Checks if a regex pattern is valid.
     Slippy regex patterns cannot have un-escaped delimeters.
     """
-
+    #pattern = re.escape(pattern)
     d = re.escape(d)
     unescaped_del_pattern = rf'[^\\]{d}|^{d}'
 
@@ -43,7 +43,7 @@ def isValidRegex(pattern, d=r'/'):
         if re.search(unescaped_del_pattern, pattern):
             util.printInvalidCommand()
         # Check regex is valid
-        re.compile(pattern)
+        re.compile(re.escape(pattern))
     except re.error:
         util.printInvalidCommand()
 
@@ -116,7 +116,6 @@ def getAddressInfo(cmd, cmd_info):
 
 def getCommandInfo(cmd, cmd_info):
 
-
     if result := re.search(r'^q\s*$', cmd):
         cmd_info.operation = result.group()
 
@@ -145,8 +144,14 @@ def getCommandInfo(cmd, cmd_info):
 
         if result := re.search(s_pattern, cmd):
 
-            cmd_info.s_pattern = isValidRegex(result.group(1), d)
             cmd_info.s_replace = isValidRegex(result.group(2), d)
+            cmd_info.s_pattern = isValidRegex(result.group(1), d)
+            try:
+                #pattern gets one extra check
+                re.compile(cmd_info.s_pattern)
+            except re.error:
+                util.printInvalidCommand()
+
 
             if result.group(3).strip() == 'g':
                 cmd_info.s_global_flag = 0

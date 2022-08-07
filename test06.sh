@@ -4,7 +4,7 @@
 # ==============================================================================
 # test06.sh
 #
-# Testing slippy subs alternate delimeters
+# Testing slippy multiple commands in files and input files
 # ==============================================================================
 
 
@@ -26,7 +26,7 @@ test_outcome()
 	if ! diff "$1" "$2"
 	then
     	echo "Failed test"
-    	#exit 1
+    	exit 1
     else
     	echo "Pass"
 	fi
@@ -36,202 +36,170 @@ mkdir tmp
 cd tmp
 
 
+cat - <<eof > input
+1
+2
+3
+4
+5
 
-echo "-------------Test All Characters as Delimeter------------"
+11
+12
+13
+14
+15
+
+eof
+
+
+
+
+echo "-------------Multiple Commands in script ------------"
+cat - <<eof > script1
+1p
+2d
+3s/./x/
+
+1,10p ; 3,/2/ s/[1]//g ;;;
+
+;;; 9d
+
+14q
+eof
 
 (
-seq 5| slippy 's!a!rb!g'
-# seq 5| slippy 's#a#rb#g' #broken
-seq 5| slippy 's$a$rb$g'
-seq 5| slippy 's%a%rb%g'
-seq 5| slippy 's&a&rb&g'
-seq 5| slippy 's(a(rb(g'
-seq 5| slippy 's)a)rb)g'
-seq 5| slippy 's*a*rb*g'
-seq 5| slippy 's+a+rb+g'
-seq 5| slippy 's,a,rb,g'
-
-seq 5| slippy 's-a-rb-g'
-seq 5| slippy 's.a.rb.g'
-seq 5| slippy 's/a/rb/g'
-seq 5| slippy 's0a0rb0g'
-seq 5| slippy 's1a1rb1g'
-seq 5| slippy 's2a2rb2g'
-seq 5| slippy 's3a3rb3g'
-seq 5| slippy 's4a4rb4g'
-seq 5| slippy 's5a5rb5g'
-
-seq 5| slippy 's6a6rb6g'
-seq 5| slippy 's7a7rb7g'
-seq 5| slippy 's8a8rb8g'
-seq 5| slippy 's9a9rb9g'
-seq 5| slippy 's:a:rb:g'
-seq 5| slippy 's;a;rb;g'
-seq 5| slippy 's<a<rb<g'
-seq 5| slippy 's=a=rb=g'
-seq 5| slippy 's>a>rb>g'
-seq 5| slippy 's?a?rb?g'
-seq 5| slippy 's@a@rb@g'
-seq 5| slippy 'sAaArbAg'
-seq 5| slippy 'sBaBrbBg'
-seq 5| slippy 'sCaCrbCg'
-
-seq 5| slippy 'sDaDrbDg'
-seq 5| slippy 'sEaErbEg'
-seq 5| slippy 'sFaFrbFg'
-seq 5| slippy 'sGaGrbGg'
-seq 5| slippy 'sHaHrbHg'
-seq 5| slippy 'sIaIrbIg'
-seq 5| slippy 'sJaJrbJg'
-seq 5| slippy 'sKaKrbKg'
-seq 5| slippy 'sLaLrbLg'
-seq 5| slippy 'sMaMrbMg'
-seq 5| slippy 'sNaNrbNg'
-seq 5| slippy 'sOaOrbOg'
-seq 5| slippy 'sPaPrbPg'
-seq 5| slippy 'sQaQrbQg'
-seq 5| slippy 'sRaRrbRg'
-seq 5| slippy 'sSaSrbSg'
-seq 5| slippy 'sTaTrbTg'
-seq 5| slippy 'sUaUrbUg'
-seq 5| slippy 'sVaVrbVg'
-
-seq 5| slippy 'sWaWrbWg'
-seq 5| slippy 'sXaXrbXg'
-seq 5| slippy 'sYaYrbYg'
-seq 5| slippy 'sZaZrbZg'
-seq 5| slippy 's[a[rb[g'
-# seq 5| slippy 's\a\rb\g' #broken
-seq 5| slippy 's]a]rb]g'
-seq 5| slippy 's^a^rb^g'
-seq 5| slippy 's_a_rb_g'
-seq 5| slippy 'scacrbcg'
-seq 5| slippy 'sdadrbdg'
-seq 5| slippy 'seaerbeg'
-seq 5| slippy 'sfafrbfg'
-# seq 5| slippy 'sgagrbgg' #broken
-seq 5| slippy 'shahrbhg'
-seq 5| slippy 'siairbig'
-
-seq 5| slippy 'sjajrbjg'
-seq 5| slippy 'skakrbkg'
-seq 5| slippy 'slalrblg'
-seq 5| slippy 'smamrbmg'
-seq 5| slippy 'snanrbng'
-seq 5| slippy 'soaorbog'
-seq 5| slippy 'spaprbpg'
-seq 5| slippy 'sqaqrbqg'
-
-seq 5| slippy 'ssasrbsg'
-seq 5| slippy 'statrbtg'
-
-seq 5| slippy 'suaurbug'
-seq 5| slippy 'svavrbvg'
-seq 5| slippy 'swawrbwg'
-seq 5| slippy 'sxaxrbxg'
-seq 5| slippy 'syayrbyg'
-seq 5| slippy 'szazrbzg'
-seq 5| slippy 's{a{rb{g'
-seq 5| slippy 's|a|rb|g'
-seq 5| slippy 's}a}rb}g'
+cat input | slippy -f script1
+cat input | slippy -n -f script1
 ) > "$output" 
 
 (
-seq 5| 2041 slippy 's!a!rb!g'
-# seq 5| 2041 slippy 's#a#rb#g'#broken
-seq 5| 2041 slippy 's$a$rb$g'
-seq 5| 2041 slippy 's%a%rb%g'
-seq 5| 2041 slippy 's&a&rb&g'
-seq 5| 2041 slippy 's(a(rb(g'
-seq 5| 2041 slippy 's)a)rb)g'
-seq 5| 2041 slippy 's*a*rb*g'
-seq 5| 2041 slippy 's+a+rb+g'
-seq 5| 2041 slippy 's,a,rb,g'
+cat input | 2041 slippy -f script1
+cat input | 2041 slippy -n -f script1
+) > "$expected_output" 
 
-seq 5| 2041 slippy 's-a-rb-g'
-seq 5| 2041 slippy 's.a.rb.g'
-seq 5| 2041 slippy 's/a/rb/g'
-seq 5| 2041 slippy 's0a0rb0g'
-seq 5| 2041 slippy 's1a1rb1g'
-seq 5| 2041 slippy 's2a2rb2g'
-seq 5| 2041 slippy 's3a3rb3g'
-seq 5| 2041 slippy 's4a4rb4g'
-seq 5| 2041 slippy 's5a5rb5g'
+test_outcome "$output" "$expected_output"
 
-seq 5| 2041 slippy 's6a6rb6g'
-seq 5| 2041 slippy 's7a7rb7g'
-seq 5| 2041 slippy 's8a8rb8g'
-seq 5| 2041 slippy 's9a9rb9g'
-seq 5| 2041 slippy 's:a:rb:g'
-seq 5| 2041 slippy 's;a;rb;g'
-seq 5| 2041 slippy 's<a<rb<g'
-seq 5| 2041 slippy 's=a=rb=g'
-seq 5| 2041 slippy 's>a>rb>g'
-seq 5| 2041 slippy 's?a?rb?g'
-seq 5| 2041 slippy 's@a@rb@g'
-seq 5| 2041 slippy 'sAaArbAg'
-seq 5| 2041 slippy 'sBaBrbBg'
-seq 5| 2041 slippy 'sCaCrbCg'
 
-seq 5| 2041 slippy 'sDaDrbDg'
-seq 5| 2041 slippy 'sEaErbEg'
-seq 5| 2041 slippy 'sFaFrbFg'
-seq 5| 2041 slippy 'sGaGrbGg'
-seq 5| 2041 slippy 'sHaHrbHg'
-seq 5| 2041 slippy 'sIaIrbIg'
-seq 5| 2041 slippy 'sJaJrbJg'
-seq 5| 2041 slippy 'sKaKrbKg'
-seq 5| 2041 slippy 'sLaLrbLg'
-seq 5| 2041 slippy 'sMaMrbMg'
-seq 5| 2041 slippy 'sNaNrbNg'
-seq 5| 2041 slippy 'sOaOrbOg'
-seq 5| 2041 slippy 'sPaPrbPg'
-seq 5| 2041 slippy 'sQaQrbQg'
-seq 5| 2041 slippy 'sRaRrbRg'
-seq 5| 2041 slippy 'sSaSrbSg'
-seq 5| 2041 slippy 'sTaTrbTg'
-seq 5| 2041 slippy 'sUaUrbUg'
-seq 5| 2041 slippy 'sVaVrbVg'
 
-seq 5| 2041 slippy 'sWaWrbWg'
-seq 5| 2041 slippy 'sXaXrbXg'
-seq 5| 2041 slippy 'sYaYrbYg'
-seq 5| 2041 slippy 'sZaZrbZg'
-seq 5| 2041 slippy 's[a[rb[g'
-# seq 5| 2041 slippy 's\a\rb\g' #broken
-seq 5| 2041 slippy 's]a]rb]g'
-seq 5| 2041 slippy 's^a^rb^g'
-seq 5| 2041 slippy 's_a_rb_g'
-seq 5| 2041 slippy 'scacrbcg'
-seq 5| 2041 slippy 'sdadrbdg'
-seq 5| 2041 slippy 'seaerbeg'
-seq 5| 2041 slippy 'sfafrbfg'
-seq 5| 2041 slippy 'sgagrbgg'
-seq 5| 2041 slippy 'shahrbhg'
-seq 5| 2041 slippy 'siairbig'
 
-seq 5| 2041 slippy 'sjajrbjg'
-seq 5| 2041 slippy 'skakrbkg'
-seq 5| 2041 slippy 'slalrblg'
-seq 5| 2041 slippy 'smamrbmg'
-seq 5| 2041 slippy 'snanrbng'
-seq 5| 2041 slippy 'soaorbog'
-seq 5| 2041 slippy 'spaprbpg'
-seq 5| 2041 slippy 'sqaqrbqg'
+echo "-------------Multiple Commands in script with comments ------------"
+cat - <<'eof' > script2
 
-seq 5| 2041 slippy 'ssasrbsg'
-seq 5| 2041 slippy 'statrbtg'
+1,10p; #comment 1
 
-seq 5| 2041 slippy 'suaurbug'
-seq 5| 2041 slippy 'svavrbvg'
-seq 5| 2041 slippy 'swawrbwg'
-seq 5| 2041 slippy 'sxaxrbxg'
-seq 5| 2041 slippy 'syayrbyg'
-seq 5| 2041 slippy 'szazrbzg'
-seq 5| 2041 slippy 's{a{rb{g'
-seq 5| 2041 slippy 's|a|rb|g'
-seq 5| 2041 slippy 's}a}rb}g'
+#comment 2
 
+5, $ s/[5]/x/g ;; #comment 3;; #comment 4
+
+/./,/./p
+/./,$ s/./y/
+14q
+#comment 5
+eof
+
+(
+cat input | slippy -f script2
+cat input | slippy -n -f script2
+) > "$output" 
+
+(
+cat input | 2041 slippy -f script2
+cat input | 2041 slippy -n -f script2
+) > "$expected_output" 
+
+test_outcome "$output" "$expected_output"
+
+
+
+
+echo "-------------Large Number of Commands------------"
+cat - <<'eof' > script3
+/2$/,/8$/d;4,6p
+/2/d;4q
+4q;/2/d
+sX[15]XzzzX
+s?[15]?zzz?;5s/5/9/g;5s/1/2/
+s/e//g
+s/[15]/zzz/
+s/z/x/
+/.{2}/d
+4d
+/^.+5$/p
+s?[15]?zzz?
+/2/d
+4p;/2/d
+3,/2/d
+1,25p; 2,24d
+1,5p; 2,7d; 4,10d;/2$/,/8/d;55,6d
+1,10p;3,4p
+/2$/,/8$/d;55,6p
+/2/d;4q
+4q;/2/d
+/./p
+sX[15]XzzzX
+/2/d
+eof
+
+(
+cat input | slippy -f script3
+cat input | slippy -n -f script3
+) > "$output" 
+
+(
+cat input | 2041 slippy -f script3
+cat input | 2041 slippy -n -f script3
+) > "$expected_output" 
+
+test_outcome "$output" "$expected_output"
+
+
+
+
+echo "-------------Multiple Input Files------------"
+seq 10 > file1
+cat - <<eof > file2
+line 1
+line 2
+line 3
+eof
+seq 101 99  1000 > file3
+
+(
+cat input | slippy -n 'p' file1 file2 file3
+cat input | slippy  '3,5d' file1 file2 file3
+cat input | slippy  '/2/,/5/ s/2./x/' file1 file2 file3
+
+) > "$output" 
+
+(
+cat input | 2041 slippy -n 'p' file1 file2 file3
+cat input | 2041 slippy  '3,5d' file1 file2 file3
+cat input | 2041 slippy  '/2/,/5/ s/2./x/' file1 file2 file3
+) > "$expected_output" 
+
+test_outcome "$output" "$expected_output"
+
+
+
+echo "-------------Multiple Input Files with $ addresses------------"
+
+(
+cat input | slippy -n '$p' file1 file2 file3
+cat input | slippy  '3,$d' file1 file2 file3
+cat input | slippy  '/2/,$ s/2./x/' file1 file2 file3
+cat input | slippy  '$,$ p' file1 file2 file3
+cat input | slippy  '$,$ d' file1 file2 file3
+cat input | slippy  '$,1/ s/./x/' file1 file2 file3
+
+) > "$output" 
+
+(
+cat input | 2041 slippy -n '$p' file1 file2 file3
+cat input | 2041 slippy  '3,$d' file1 file2 file3
+cat input | 2041 slippy  '/2/,$ s/2./x/' file1 file2 file3
+cat input | 2041 slippy  '$,$ p' file1 file2 file3
+cat input | 2041 slippy  '$,$ d' file1 file2 file3
+cat input | 2041 slippy  '$,1/ s/./x/' file1 file2 file3
 ) > "$expected_output" 
 
 test_outcome "$output" "$expected_output"
@@ -240,20 +208,10 @@ test_outcome "$output" "$expected_output"
 
 
 
-echo "-------------Test Escaped Delimeters in patterns------------"
-(
-seq 5| slippy 's/. \/ / x \/ /g'
-seq 5| slippy 's_ \_ \_ abc _ \_ _    g'
 
-) > "$output" 
 
-(
-seq 5| 2041 slippy 's/. \/ / x \/ /g'
-seq 5| 2041 slippy 's_ \_ \_ abc _ \_ _    g'
 
-) > "$expected_output" 
 
-test_outcome "$output" "$expected_output"
 
 
 

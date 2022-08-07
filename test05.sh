@@ -4,7 +4,7 @@
 # ==============================================================================
 # test05.sh
 #
-# Testing slippy multiple commands in files and input files
+# Testing slippy addresses with '$' character
 # ==============================================================================
 
 
@@ -52,29 +52,64 @@ cat - <<eof > input
 eof
 
 
-
-
-echo "-------------Multiple Commands in script ------------"
-cat - <<eof > script1
-1p
-2d
-3s/./x/
-
-1,10p ; 3,/2/ s/[1]//g ;;;
-
-;;; 9d
-
-14q
-eof
-
+echo "-------------INVALID INPUT------------"
 (
-cat input | slippy -f script1
-cat input | slippy -n -f script1
+seq 5 | slippy '$$p'		
+seq 5 | slippy '$$,$$d'	
+seq 5 | slippy '$$,2d'	
+seq 5 | slippy '1,$$s/a/b/'	
+seq 5 | slippy '/$$/,$$q'	
+seq 5 | slippy '$$,/$$/p'	
+
+) 2> "$output" 
+
+(		
+seq 5 | 2041 slippy '$$p'		
+seq 5 | 2041 slippy '$$,$$d'	
+seq 5 | 2041 slippy '$$,2d'	
+seq 5 | 2041 slippy '1,$$s/a/b/'	
+seq 5 | 2041 slippy '/$$/,$$q'	
+seq 5 | 2041 slippy '$$,/$$/p'	
+) 2> "$expected_output" 
+
+
+test_outcome "$output" "$expected_output"
+
+
+echo "-------------VALID '$[qpds]'------------"
+(
+cat input | slippy '$q'
+cat input | slippy '$p'
+cat input | slippy '$d'
+cat input | slippy '$s/1/x/'
+cat input | slippy '$p ; $d ; $q ; $s/./x/'
+cat input | slippy '$d ; $p ; $q ; $s/./x/'
+cat input | slippy '$q ; $p ; $d ; $s/./x/'
+cat input | slippy '$s/./x/ ; $p ; $d ; $q'
+
+cat input | slippy -n '$q'
+cat input | slippy -n '$p'
+cat input | slippy -n '$d'
+cat input | slippy -n '$s/1/x/'
+
 ) > "$output" 
 
 (
-cat input | 2041 slippy -f script1
-cat input | 2041 slippy -n -f script1
+cat input | 2041 slippy '$q'
+cat input | 2041 slippy '$p'
+cat input | 2041 slippy '$d'
+cat input | 2041 slippy '$s/1/x/'
+cat input | 2041 slippy '$p ; $d ; $q ; $s/./x/'
+cat input | 2041 slippy '$d ; $p ; $q ; $s/./x/'
+cat input | 2041 slippy '$q ; $p ; $d ; $s/./x/'
+cat input | 2041 slippy '$s/./x/ ; $p ; $d ; $q'
+
+cat input | 2041 slippy -n '$q'
+cat input | 2041 slippy -n '$p'
+cat input | 2041 slippy -n '$d'
+cat input | 2041 slippy -n '$s/1/x/'
+
+
 ) > "$expected_output" 
 
 test_outcome "$output" "$expected_output"
@@ -82,127 +117,91 @@ test_outcome "$output" "$expected_output"
 
 
 
-echo "-------------Multiple Commands in script with comments ------------"
-cat - <<'eof' > script2
 
-1,10p; #comment 1
-
-#comment 2
-
-5, $ s/[5]/x/g ;; #comment 3;; #comment 4
-
-/./,/./p
-/./,$ s/./y/
-14q
-#comment 5
-eof
-
+echo "-------------VALID 'n,$[qpds]'------------"
 (
-cat input | slippy -f script2
-cat input | slippy -n -f script2
+cat input | slippy '3,$p'
+cat input | slippy '3,$d'
+cat input | slippy '3,$s/1/x/'
+cat input | slippy '100,$s/1/x/; 1,$p; 3,$d'
+cat input | slippy '3,$d; $q; $p'
+
+
+
 ) > "$output" 
 
 (
-cat input | 2041 slippy -f script2
-cat input | 2041 slippy -n -f script2
+cat input | 2041 slippy '3,$p'
+cat input | 2041 slippy '3,$d'
+cat input | 2041 slippy '3,$s/1/x/'
+cat input | 2041 slippy '100,$s/1/x/; 1,$p; 3,$d'
+cat input | 2041 slippy '3,$d; $q; $p'
+
 ) > "$expected_output" 
 
 test_outcome "$output" "$expected_output"
 
 
 
-
-echo "-------------Large Number of Commands------------"
-cat - <<'eof' > script3
-/2$/,/8$/d;4,6p
-/2/d;4q
-4q;/2/d
-sX[15]XzzzX
-s?[15]?zzz?;5s/5/9/g;5s/1/2/
-s/e//g
-s/[15]/zzz/
-s/z/x/
-/.{2}/d
-4d
-/^.+5$/p
-s?[15]?zzz?
-/2/d
-4p;/2/d
-3,/2/d
-1,25p; 2,24d
-1,5p; 2,7d; 4,10d;/2$/,/8/d;55,6d
-1,10p;3,4p
-/2$/,/8$/d;55,6p
-/2/d;4q
-4q;/2/d
-/./p
-sX[15]XzzzX
-/2/d
-eof
-
+echo "-------------VALID '$,n[qpds]'------------"
 (
-cat input | slippy -f script3
-cat input | slippy -n -f script3
+cat input | slippy '$,1p'
+cat input | slippy '$,1d'
+cat input | slippy '$,1s/./x/g'
+cat input | slippy '$,1p;$,1d;$,1s/./x/g'
 ) > "$output" 
 
 (
-cat input | 2041 slippy -f script3
-cat input | 2041 slippy -n -f script3
+cat input | 2041 slippy '$,1p'
+cat input | 2041 slippy '$,1d'
+cat input | 2041 slippy '$,1s/./x/g'
+cat input | 2041 slippy '$,1p;$,1d;$,1s/./x/g'
 ) > "$expected_output" 
 
 test_outcome "$output" "$expected_output"
 
 
 
-
-echo "-------------Multiple Input Files------------"
-seq 10 > file1
-cat - <<eof > file2
-line 1
-line 2
-line 3
-eof
-seq 101 99  1000 > file3
-
+echo "-------------VALID '$,$[qpds]'------------"
 (
-cat input | slippy -n 'p' file1 file2 file3
-cat input | slippy  '3,5d' file1 file2 file3
-cat input | slippy  '/2/,/5/ s/2./x/' file1 file2 file3
+cat input | slippy '$,$p'
+cat input | slippy '$,$d'
+cat input | slippy '$,$s/./x/'
+cat input | slippy '$,$p;$,$d;$,$s/./x/'
 
 ) > "$output" 
 
 (
-cat input | 2041 slippy -n 'p' file1 file2 file3
-cat input | 2041 slippy  '3,5d' file1 file2 file3
-cat input | 2041 slippy  '/2/,/5/ s/2./x/' file1 file2 file3
+cat input | 2041 slippy '$,$p'
+cat input | 2041 slippy '$,$d'
+cat input | 2041 slippy '$,$s/./x/'
+cat input | 2041 slippy '$,$p;$,$d;$,$s/./x/'
 ) > "$expected_output" 
 
 test_outcome "$output" "$expected_output"
 
 
 
-echo "-------------Multiple Input Files with $ addresses------------"
-
+echo "-------------VALID MULTI-COMMANDS------------"
 (
-cat input | slippy -n '$p' file1 file2 file3
-cat input | slippy  '3,$d' file1 file2 file3
-cat input | slippy  '/2/,$ s/2./x/' file1 file2 file3
-cat input | slippy  '$,$ p' file1 file2 file3
-cat input | slippy  '$,$ d' file1 file2 file3
-cat input | slippy  '$,1/ s/./x/' file1 file2 file3
+cat input | slippy '$,$d; $,$p; $,$s|.|x|g ;; $d; $,$s:x.:xy:'
+cat input | slippy '1,5d; 3,$p; 1,$s|.|x|g ;; 2d; 1,$s:x.:xy:'
+cat input | slippy '2,3p ;;  1,$d; p ; 1,$s/[12]/y/' 
+
 
 ) > "$output" 
 
 (
-cat input | 2041 slippy -n '$p' file1 file2 file3
-cat input | 2041 slippy  '3,$d' file1 file2 file3
-cat input | 2041 slippy  '/2/,$ s/2./x/' file1 file2 file3
-cat input | 2041 slippy  '$,$ p' file1 file2 file3
-cat input | 2041 slippy  '$,$ d' file1 file2 file3
-cat input | 2041 slippy  '$,1/ s/./x/' file1 file2 file3
+cat input | 2041 slippy '$,$d; $,$p; $,$s|.|x|g ;; $d; $,$s:x.:xy:'
+cat input | 2041 slippy '1,5d; 3,$p; 1,$s|.|x|g ;; 2d; 1,$s:x.:xy:'
+cat input | 2041 slippy '2,3p ;;  1,$d; p ; 1,$s/[12]/y/' 
+
 ) > "$expected_output" 
 
 test_outcome "$output" "$expected_output"
+
+
+
 
 
 

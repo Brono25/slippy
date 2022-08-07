@@ -4,7 +4,7 @@
 # ==============================================================================
 # test00.sh
 #
-# Testing slippy Quit functionality and Slippy usage
+# Testing slippy Usage
 # ==============================================================================
 
 
@@ -43,33 +43,19 @@ echo "-------------SLIPPY USAGE------------"
 seq 5 > "$test_input"
 
 (
-seq 5 | slippy     		#usage
-echo $? 1>&2
-seq 5 | slippy 1   		#invalid command
-echo $? 1>&2
-seq 5 | slippy q q   	#error
-echo $? 1>&2
-seq 5 | slippy  d d    	#error
-echo $? 1>&2
-seq 5 | slippy  p p     #error
-echo $? 1>&2
-# seq 5 | slippy  s s 	#invalid command
-# echo $? 1>&2
+seq 5 | slippy     		
+seq 5 | slippy 1   		
+seq 5 | slippy q q   	
+seq 5 | slippy  d d    	
+seq 5 | slippy  p p     
 ) 2> "$output" 
 
 (
 seq 5 | 2041 slippy  
-echo $? 1>&2
 seq 5 | 2041 slippy 1  
-echo $? 1>&2
 seq 5 | 2041 slippy q q 
-echo $? 1>&2
 seq 5 | 2041 slippy d d 
-echo $? 1>&2
 seq 5 | 2041 slippy p p 
-echo $? 1>&2
-# seq 5 | 2041 slippy s s 
-# echo $? 1>&2
 ) 2> "$expected_output" 
 
 test_outcome "$output" "$expected_output"
@@ -92,133 +78,143 @@ test_outcome "$output" "$expected_output"
 
 
 
-#slippy quit number address behaviour
-echo "-------------Q-NUMBER ADDRESS VALID------------"
+#Checking invalid addresses 
+
+echo "-------------INVALID 'n'------------"
 (
-seq 5| slippy 'q'
-seq 5| slippy ' q'
-seq 5| slippy ' q '
-seq 5| slippy '3q'
-seq 5| slippy ' 3   q  '
-seq 5| slippy '5q'
-seq 5| slippy '10q'
-# seq 5| slippy ''
-yes  | slippy '10q' #inf input
+seq 5 | slippy '0p'
 
-
-) > "$output" 
-
-(
-seq 5|2041 slippy 'q'
-seq 5|2041 slippy ' q'
-seq 5|2041 slippy ' q '
-seq 5|2041 slippy '3q'
-seq 5|2041 slippy ' 3   q  '
-seq 5|2041 slippy '5q'
-seq 5|2041 slippy '10q'
-# seq 5|2041 slippy ''
-yes  |2041 slippy '10q' #inf input
-) > "$expected_output" 
-
-
-test_outcome "$output" "$expected_output"
-
-
-#testing invalid arguments while using slippy quit
-echo "-------------Q-ADDRESS INVALID------------"
-(
-seq 5| slippy 'sq'		#invalid command
-echo $? 1>&2
-seq 5| slippy '2/q'		#invalid command
-echo $? 1>&2
-seq 5| slippy '2.q'		#invalid command
-echo $? 1>&2
-seq 5| slippy '//q'		#invalid command
-echo $? 1>&2
-seq 5| slippy '///q'	#invalid command
-echo $? 1>&2
-seq 5| slippy '////q'	#invalid command
-echo $? 1>&2
-seq 5| slippy '0q'		#invalid command
-echo $? 1>&2
-seq 5|slippy '|q'
-echo $? 1>&2
-seq 5|slippy '/\/q'
-echo $? 1>&2
 ) 2> "$output" 
 
 (
-seq 5|2041 slippy 'sq'		#invalid command
-echo $? 1>&2
-seq 5|2041 slippy '2/q'		#invalid command
-echo $? 1>&2
-seq 5|2041 slippy '2.q'		#invalid command
-echo $? 1>&2
-seq 5|2041 slippy '//q'		#invalid command
-echo $? 1>&2
-seq 5|2041 slippy '///q'	#invalid command
-echo $? 1>&2
-seq 5|2041 slippy '////q'	#invalid command
-echo $? 1>&2
-seq 5|2041 slippy '0q'		#invalid command
-echo $? 1>&2
-seq 5|2041 slippy '|q'		#invalid command
-echo $? 1>&2
-seq 5|2041 slippy '/\/q'	#invalid command
-echo $? 1>&2
+seq 5 | 2041  slippy '0p'
 
 ) 2> "$expected_output" 
 
 test_outcome "$output" "$expected_output"
 
 
-echo "-------------Q-DELIMETER ADDRESS VALID------------"
-(
-# seq 5| slippy '\/1/q'
-seq 5| slippy '/ /q'
-seq 5| slippy '/^/q'
-seq 5| slippy '/^ /q'
-seq 5| slippy '/^$/q'
-seq 5| slippy '/$/q'
-seq 5| slippy '/$ /q'
-seq 5| slippy '/2/    q' 
-seq 5| slippy '    /2/    q' 
-seq 5| slippy '/|/q' 
 
-) > "$output" 
+echo "-------------INVALID '/regex/'------------"
+(
+seq 25 | slippy '//p'
+seq 25 | slippy '/\/p'
+
+seq 25 | slippy -n '//p'
+seq 25 | slippy -n '/\/p'
+
+
+) 2> "$output" 
 
 (
-# seq 5|2041 slippy '\/1/q'
-seq 5|2041 slippy '/ /q'
-seq 5|2041 slippy '/^/q'
-seq 5|2041 slippy '/^ /q'
-seq 5|2041 slippy '/^$/q'
-seq 5|2041 slippy '/$/q'
-seq 5|2041 slippy '/$ /q'
-seq 5|2041 slippy '/2/    q' 
-seq 5|2041 slippy '    /2/    q' 
-seq 5|2041 slippy '/|/q' 
+seq 25 | 2041 slippy '//p'
+seq 25 | 2041 slippy '/\/p'
 
-) > "$expected_output" 
+seq 25 | 2041 slippy -n '//p'
+seq 25 | 2041 slippy -n '/\/p'
 
+) 2> "$expected_output" 
 
 test_outcome "$output" "$expected_output"
 
 
 
-echo "-------------MULTIPLE COMMANDS------------"
+
+echo "-------------INVALID n1,n2 ------------"
 (
-seq 25| slippy '1,5d; 3q;' 
-seq 25| slippy '3q; 1,5d;' 
-seq 25| slippy '3d;3q;4d;4q;5q' 
-) > "$output" 
+seq 25 | slippy 'xp'
+seq 25 | slippy '  x2p  '
+seq 25 | slippy 'x1,x2p'
+seq 25 | slippy '1,,2p'
+seq 25 | slippy  '1,2,p'
+seq 25 | slippy  ',1,2 p'
+
+seq 25 | slippy -n 'xp'
+seq 25 | slippy -n '  x2p  '
+seq 25 | slippy -n 'x1,x2p'
+seq 25 | slippy -n '1,,2p'
+seq 25 | slippy -n '1,2,p'
+seq 25 | slippy -n ',1,2 p'
+) 2> "$output" 
 
 (
-seq 25| 2041 slippy '1,5d; 3q;' 
-seq 25| 2041 slippy '3q; 1,5d;' 
-seq 25| 2041 slippy '3d;3q;4d;4q;5q' 
-) > "$expected_output" 
+seq 25 | 2041 slippy 'xp'
+seq 25 | 2041 slippy '  x2p  '
+seq 25 | 2041 slippy 'x1,x2p'
+seq 25 | 2041 slippy '1,,2p'
+seq 25 | 2041 slippy  '1,2,p'
+seq 25 | 2041 slippy  ',1,2 p'
 
+seq 25 | 2041 slippy -n 'xp'
+seq 25 | 2041 slippy -n '  x2p  '
+seq 25 | 2041 slippy -n 'x1,x2p'
+seq 25 | 2041 slippy -n '1,,2p'
+seq 25 | 2041 slippy -n '1,2,p'
+seq 25 | 2041 slippy -n ',1,2 p'
+) 2> "$expected_output" 
+
+test_outcome "$output" "$expected_output"
+
+
+
+echo "-------------INVALID n, /regx/------------"
+(
+seq 25 | slippy  '2,///p'
+seq 25 | slippy  '1,xp'
+seq 25 | slippy  'x,/1/p'
+seq 25 | slippy  '/x/,1,p'
+) 2> "$output" 
+
+(
+seq 25 | 2041 slippy  '2,///p'
+seq 25 | 2041 slippy  '1,xp'
+seq 25 | 2041 slippy  'x,/1/p'
+seq 25 | 2041 slippy  '/x/,1,p'
+) 2> "$expected_output" 
+
+test_outcome "$output" "$expected_output"
+
+
+
+
+
+echo "-------------INVALID /regx/,n ------------"
+(
+seq 25 | slippy  '///,1p'
+seq 25 | slippy  'x,1p'
+seq 25 | slippy  'x,1p'
+seq 25 | slippy  'x,1,p'
+
+) 2> "$output" 
+
+(
+seq 25 | 2041 slippy  '///,1p'
+seq 25 | 2041 slippy  'x,1p'
+seq 25 | 2041 slippy  'x,1p'
+seq 25 | 2041 slippy  'x,1,p'
+
+) 2> "$expected_output" 
+
+test_outcome "$output" "$expected_output"
+
+
+
+
+echo "-------------INVALID /regx1/,/regx2/ ------------"
+(
+seq 25 | slippy  '///,2p'
+seq 25 | slippy  '//,/ /p' 
+seq 25 | slippy  '/1/,,/2/p'
+seq 25 | slippy  ',/1/,/2/p'
+) 2> "$output" 
+
+(
+seq 25 | 2041 slippy  '///,2p'
+seq 25 | 2041 slippy  '//,/ /p' 
+seq 25 | 2041 slippy  '/1/,,/2/p'
+seq 25 | 2041 slippy  ',/1/,/2/p'
+
+) 2> "$expected_output" 
 
 test_outcome "$output" "$expected_output"
 

@@ -14,13 +14,15 @@ class Command:
 
         # address info
         self.is_address_found = False
-        self.is_dollar_sign   = False
         self.single_num       = None
-        self.single_regexp    = None
+        self.single_regex    = None
         self.start_num        = None
-        self.start_regexp     = None
+        self.start_regex     = None
         self.end_num          = None
-        self.end_regexp       = None
+        self.end_regex       = None
+        self.single_doll      = False
+        self.end_doll         = False
+        self.beg_doll         = False
         self.full_address     = None
         # subs info
         self.s_pattern        = None
@@ -33,10 +35,9 @@ def isValidRegex(pattern, d=r'/'):
     Checks if a regex pattern is valid.
     Slippy regex patterns cannot have un-escaped delimeters.
     """
-    #pattern = re.escape(pattern)
+
     d = re.escape(d)
     unescaped_del_pattern = rf'[^\\]{d}|^{d}'
-
 
 
     try:
@@ -52,8 +53,13 @@ def isValidRegex(pattern, d=r'/'):
 
 
 def isValidNumber(num):
-    if num == 0:
+
+    if num != r'$' and int(num) == 0:
         util.printInvalidCommand()
+
+    if num != r'$':
+        num = int(num)
+
     return num
 
 
@@ -61,52 +67,58 @@ def getAddressInfo(cmd, cmd_info):
     """
     Retreive the address for a given slippy command
     """
-
+    n = r'(?:\d+|\$)'
     no_adrr = r'^[qpds]'
-    single_num = r'(^(\d+|[$]{1})\s*)[qpds]'
+    single_num = rf'(^({n})\s*)[qpds]'
     single_regx = r'(^/(.+)/\s*)[qpds]'
     regx_regx = r'(^/(.+)/\s*,\s*/(.+)/\s*)[pds]'
-    regx_num = r'(^/(.+)/\s*,\s*(\d+)\s*)[pds]'
-    num_regx = r'(^(\d+)\s*,\s*/(.+)/\s*)[pds]'
-    num_num = r'(^(\d+)\s*,\s*(\d+)\s*)[pds]'
+    regx_num = rf'(^/(.+)/\s*,\s*({n})\s*)[pds]'
+    num_regx = rf'(^({n})\s*,\s*/(.+)/\s*)[pds]'
+    num_num = rf'(^({n})\s*,\s*({n})\s*)[pds]'
+
+
 
     if result := re.search(no_adrr, cmd):
         cmd_info.is_address_found = False
 
     elif result := re.search(regx_regx, cmd):
         cmd_info.full_address = result.group(1)
-        cmd_info.start_regexp = isValidRegex(result.group(2))
-        cmd_info.end_regexp = isValidRegex(result.group(3))
+        cmd_info.start_regex = isValidRegex(result.group(2))
+        cmd_info.end_regex = isValidRegex(result.group(3))
         cmd_info.is_address_found = True
 
     elif result := re.search(regx_num, cmd):
         cmd_info.full_address = result.group(1)
-        cmd_info.start_regexp = isValidRegex(result.group(2))
+        cmd_info.start_regex = isValidRegex(result.group(2))
         cmd_info.end_num = isValidNumber(int(result.group(3)))
         cmd_info.is_address_found = True
 
     elif result := re.search(num_regx, cmd):
         cmd_info.full_address = result.group(1)
-        cmd_info.start_num = isValidNumber(int(result.group(2)))
-        cmd_info.end_regexp = isValidRegex(result.group(3))
+        cmd_info.start_num = isValidNumber(result.group(2))
+        cmd_info.end_regex = isValidRegex(result.group(3))
         cmd_info.is_address_found = True
 
     elif result := re.search(num_num, cmd):
         cmd_info.full_address = result.group(1)
-        cmd_info.start_num = isValidNumber(int(result.group(2)))
-        cmd_info.end_num = isValidNumber(int(result.group(3)))
-        if cmd_info.end_num < cmd_info.start_num:
-            cmd_info.end_num = cmd_info.start_num
+        cmd_info.start_num = isValidNumber(result.group(2))
+        cmd_info.end_num = isValidNumber(result.group(3))
         cmd_info.is_address_found = True
+        if cmd_info.end_num != r'$' and cmd_info.start_num != r'$':
+
+            if cmd_info.end_num < cmd_info.start_num:
+                cmd_info.end_num = cmd_info.start_num
+
 
     elif result := re.search(single_num, cmd):
         cmd_info.full_address = result.group(1)
-        cmd_info.single_num = isValidNumber(int(result.group(2)))
+        cmd_info.single_num = isValidNumber(result.group(2))
         cmd_info.is_address_found = True
+
 
     elif result := re.search(single_regx, cmd):
         cmd_info.full_address = result.group(1)
-        cmd_info.single_regexp = isValidRegex(result.group(2))
+        cmd_info.single_regex = isValidRegex(result.group(2))
         cmd_info.is_address_found = True
 
     else:
@@ -203,16 +215,18 @@ def parseCommands(cmd_list):
     If one command is invalid the program errors.
     """
 
+
     RESET_NTH_GREEDY = 1
 
     # valid command patterns
+    n = r'(?:\d+|\$)'
     no_adrr = r'^(?:[qpd]|s(.).*\1.*\1\s*g?\s*)\s*(?:#.*)?\s*[;\n]*\s*$'
-    single_num = r'^\d+\s*(?:[qpd]|s(.).*\1.*\1\s*g?\s*)\s*(?:#.*)?\s*[;\n]*\s*$'
+    single_num = rf'^{n}\s*(?:[qpd]|s(.).*\1.*\1\s*g?\s*)\s*(?:#.*)?\s*[;\n]*\s*$'
     single_regx = r'^/.+/\s*(?:[qpd]|s(.).*\1.*\1\s*g?\s*)\s*(?:#.*)?\s*[;\n]*\s*$'
     regx_regx = r'^/.+/\s*,\s*/.+/\s*(?:[pd]|s(.).*\1.*\1\s*g?\s*)\s*(?:#.*)?\s*[;\n]*\s*$'
-    regx_num = r'^/.+/\s*,\s*\d+\s*(?:[pd]|s(.).*\1.*\1\s*g?\s*)\s*(?:#.*)?\s*[;\n]*\s*$'
-    num_regx = r'^\d+\s*,\s*/.+/\s*(?:[pd]|s(.).*\1.*\1\s*g?\s*)\s*(?:#.*)?\s*[;\n]*\s*$'
-    num_num = r'^\d+\s*,\s*\d+\s*(?:[pd]|s(.).*\1.*\1\s*g?\s*)\s*(?:#.*)?\s*[;\n]*\s*$'
+    regx_num = rf'^/.+/\s*,\s*{n}\s*(?:[pd]|s(.).*\1.*\1\s*g?\s*)\s*(?:#.*)?\s*[;\n]*\s*$'
+    num_regx = rf'^{n}\s*,\s*/.+/\s*(?:[pd]|s(.).*\1.*\1\s*g?\s*)\s*(?:#.*)?\s*[;\n]*\s*$'
+    num_num = rf'^{n}\s*,\s*{n}\s*(?:[pd]|s(.).*\1.*\1\s*g?\s*)\s*(?:#.*)?\s*[;\n]*\s*$'
 
 
     commands = list()
@@ -344,7 +358,6 @@ def parseInput(slippy_input):
     executable_cmds = list()
 
     for cmd in cmd_list:
-
 
         cmd_info = Command()
         cmd_info = getAddressInfo(cmd, cmd_info)

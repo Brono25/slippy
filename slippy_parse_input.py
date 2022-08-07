@@ -219,7 +219,7 @@ def parseCommands(cmd_list):
     RESET_NTH_GREEDY = 1
 
     # valid command patterns
-    n = r'(?:\d+|\$)'
+    n = r'(?:\d+|\$)' # number address can be int or $
     no_adrr = r'^(?:[qpd]|s(.).*\1.*\1\s*g?\s*)\s*(?:#.*)?\s*[;\n]*\s*$'
     single_num = rf'^{n}\s*(?:[qpd]|s(.).*\1.*\1\s*g?\s*)\s*(?:#.*)?\s*[;\n]*\s*$'
     single_regx = r'^/.+/\s*(?:[qpd]|s(.).*\1.*\1\s*g?\s*)\s*(?:#.*)?\s*[;\n]*\s*$'
@@ -227,7 +227,7 @@ def parseCommands(cmd_list):
     regx_num = rf'^/.+/\s*,\s*{n}\s*(?:[pd]|s(.).*\1.*\1\s*g?\s*)\s*(?:#.*)?\s*[;\n]*\s*$'
     num_regx = rf'^{n}\s*,\s*/.+/\s*(?:[pd]|s(.).*\1.*\1\s*g?\s*)\s*(?:#.*)?\s*[;\n]*\s*$'
     num_num = rf'^{n}\s*,\s*{n}\s*(?:[pd]|s(.).*\1.*\1\s*g?\s*)\s*(?:#.*)?\s*[;\n]*\s*$'
-
+    comment_line = r'^\s*(?:#[^;\n]*)?\s*$'
 
     commands = list()
     max_greedy = len(re.findall('[\n;]', cmd_list)) + 1
@@ -336,6 +336,10 @@ def parseCommands(cmd_list):
             commands.append(trim_cmd)
 
             nth_greedy = RESET_NTH_GREEDY
+
+        elif re.search(comment_line, parsed_sc.strip()) or re.search(comment_line,parsed_nl.strip()):
+            cmd_list = ''
+            pass
 
         else:
             nth_greedy += 1

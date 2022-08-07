@@ -495,10 +495,10 @@ while True:
 
          #----------Execute Substitute----------
         elif cmd_info.operation == 's':
-            process.output_line = process.curr_line
-            
-            cmd_info, process = processSubstitute(cmd_info, process)
 
+            process.output_line = process.curr_line
+            cmd_info, process = processSubstitute(cmd_info, process)
+            process.curr_line = process.output_line
 
     if not option_n and process.output_line != None:
         print(process.output_line, end='')

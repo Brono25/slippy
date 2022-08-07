@@ -422,8 +422,9 @@ if args.option_f:
     for f in args.option_f:
         cmd_scripts += f
 
+
+input_files = list()
 if args.files:
-    input_files = list()
     for f in args.files:
         input_files += f
         
@@ -438,43 +439,51 @@ option_i  = args.option_i
 process   = Process() #holds info of the current command executions
 
 
-
+#preload next_line buffer
 if input_files:
     num_files = len(input_files)
     f_ind = 0
     input_file = open(input_files[f_ind], 'r')
     curr_line = None
     next_line = input_file.readline()
-
 else:
     curr_line = None
     next_line = sys.stdin.readline()
 
-
+eof_last_file = False
 line_num = 1
 while True:
 
+    # ----------open files and handle exits----------
+    # if eof is reached close file and open next file else end
+    if input_files and next_line == '':
+        input_file.close()
+        f_ind += 1
+        if f_ind < num_files:
+            input_file = open(input_files[f_ind], 'r')
+            next_line = input_file.readline()
+        else:
+            break
+   #when stdin is used
+    if not input_files and curr_line == '':
+        break
 
+    #make sure only the last files eof is treated as eof
+    #needed for '$' use
+    if input_files and f_ind == num_files - 1:
+        eof_last_file = True
+    #stdin always has
+    elif not input_files:
+        eof_last_file = True
+
+
+    #----------read files----------
     if input_files:
         curr_line = next_line
         next_line = input_file.readline()
     else:
         curr_line = next_line
         next_line = sys.stdin.readline()
-       
-
-    if curr_line == '':
-
-        if input_files:
-            input_file.close()
-            f_ind += 1
-            if f_ind < num_files:
-                input_file = open(input_files[f_ind], 'r')
-            else:
-                break
-        else:
-            break
-            
 
     #----------update process----------
     process.curr_line     = curr_line
@@ -486,7 +495,7 @@ while True:
     for cmd_info in cmds:
 
         #look for file end to update $ addr
-        if next_line == '':
+        if next_line == '' and eof_last_file:
             if cmd_info.single_num == r'$':
                 cmd_info.single_num = line_num
             if cmd_info.start_num == r'$':

@@ -118,6 +118,88 @@ test_outcome "$output" "$expected_output"
 
 
 
+echo "-------------VALID 'n,$[qpds]'------------"
+(
+cat input | slippy '3,$p'
+cat input | slippy '3,$d'
+cat input | slippy '3,$s/1/x/'
+cat input | slippy '100,$s/1/x/; 1,$p; 3,$d'
+cat input | slippy '3,$d; $q; $p'
+
+
+
+) > "$output" 
+
+(
+cat input | 2041 slippy '3,$p'
+cat input | 2041 slippy '3,$d'
+cat input | 2041 slippy '3,$s/1/x/'
+cat input | 2041 slippy '100,$s/1/x/; 1,$p; 3,$d'
+cat input | 2041 slippy '3,$d; $q; $p'
+
+) > "$expected_output" 
+
+test_outcome "$output" "$expected_output"
+
+
+
+echo "-------------VALID '$,n[qpds]'------------"
+(
+cat input | slippy '$,1p'
+cat input | slippy '$,1d'
+cat input | slippy '$,1s/./x/g'
+cat input | slippy '$,1p;$,1d;$,1s/./x/g'
+) > "$output" 
+
+(
+cat input | 2041 slippy '$,1p'
+cat input | 2041 slippy '$,1d'
+cat input | 2041 slippy '$,1s/./x/g'
+cat input | 2041 slippy '$,1p;$,1d;$,1s/./x/g'
+) > "$expected_output" 
+
+test_outcome "$output" "$expected_output"
+
+
+
+echo "-------------VALID '$,$[qpds]'------------"
+(
+cat input | slippy '$,$p'
+cat input | slippy '$,$d'
+cat input | slippy '$,$s/./x/'
+cat input | slippy '$,$p;$,$d;$,$s/./x/'
+
+) > "$output" 
+
+(
+cat input | 2041 slippy '$,$p'
+cat input | 2041 slippy '$,$d'
+cat input | 2041 slippy '$,$s/./x/'
+cat input | 2041 slippy '$,$p;$,$d;$,$s/./x/'
+) > "$expected_output" 
+
+test_outcome "$output" "$expected_output"
+
+
+
+echo "-------------VALID MULTI-COMMANDS------------"
+(
+cat input | slippy '$,$d; $,$p; $,$s|.|x|g ;; $d; $,$s:x.:xy:'
+cat input | slippy '1,5d; 3,$p; 1,$s|.|x|g ;; 2d; 1,$s:x.:xy:'
+cat input | slippy '2,3p ;;  1,$d; p ; 1,$s/[12]/y/' 
+
+
+) > "$output" 
+
+(
+cat input | 2041 slippy '$,$d; $,$p; $,$s|.|x|g ;; $d; $,$s:x.:xy:'
+cat input | 2041 slippy '1,5d; 3,$p; 1,$s|.|x|g ;; 2d; 1,$s:x.:xy:'
+cat input | 2041 slippy '2,3p ;;  1,$d; p ; 1,$s/[12]/y/' 
+
+) > "$expected_output" 
+
+test_outcome "$output" "$expected_output"
+
 
 
 

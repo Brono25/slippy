@@ -427,19 +427,19 @@ for opt, _ in opts:
 
 
 
-f = open('b', 'r')
+#f = open('b', 'r')
 
 
 curr_line = None
-#next_line = sys.stdin.readline()
-next_line = f.readline()
+next_line = sys.stdin.readline()
+# next_line = f.readline()
 
 line_num = 1
 while True:
 
     curr_line = next_line
-    #next_line = sys.stdin.readline()
-    next_line = f.readline()
+    next_line = sys.stdin.readline()
+    # next_line = f.readline()
 
 
     if curr_line == '':

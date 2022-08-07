@@ -6,7 +6,7 @@ import sys, re
 import slippy_utility as util
 import slippy_parse_input as parse
 import getopt
-
+import argparse
 
 class Process:
     def __init__(self):
@@ -389,61 +389,92 @@ def processSubstitute(cmd_info, process):
 
 
 
+
+def commandsFromScripts(script):
+    pass
+
+
+
+
+
 #------------------------------------------
 #                  MAIN
 #------------------------------------------
 
-if len(sys.argv[1:]) == 0:
+parser = argparse.ArgumentParser(usage='%(prog)s [-i] [-n] [-f <script-file> | <sed-command>] [<files>...]')
+parser.add_argument('input_cmd',nargs='?')
+parser.add_argument('-f', '--option_f', nargs=1, action='append')
+parser.add_argument('files', nargs='*', action='append')
+
+parser.add_argument('-i', '--option_i', action='store_true')
+parser.add_argument('-n', '--option_n', action='store_true')
+
+args = parser.parse_args()
+
+if args.input_cmd == None and args.option_f == None:
     util.printUsage()
 
+if args.input_cmd:
+    input_cmd = args.input_cmd
 
-argv = sys.argv[1:]
+if args.option_f:
+    cmd_scripts = list()
+    for f in args.option_f:
+        cmd_scripts += f
 
-try:
-    opts, args = getopt.getopt(argv, "nif")
+if args.files:
+    input_files = list()
+    for f in args.files:
+        input_files += f
+        
 
 
-except getopt.GetoptError:
-    util.printUsage()
-
-if len(args) != 1:
-    util.printError()
-
-
-input_cmd = args[0]
-process   = Process() #holds info of the current command executions
-
+input_cmd = args.input_cmd
 cmds  = parse.parseInput(input_cmd)
 
-option_n = False
-option_i = False
+option_n  = args.option_n
+option_i  = args.option_i
 
-#check options
-for opt, _ in opts:
-    if opt == '-i':
-        option_i = True
-    if opt == '-n':
-        option_n = True
+process   = Process() #holds info of the current command executions
 
 
 
-# f = open('b', 'r')
+if input_files:
+    num_files = len(input_files)
+    f_ind = 0
+    input_file = open(input_files[f_ind], 'r')
+    curr_line = None
+    next_line = input_file.readline()
 
+else:
+    curr_line = None
+    next_line = sys.stdin.readline()
 
-curr_line = None
-next_line = sys.stdin.readline()
-# next_line = f.readline()
 
 line_num = 1
 while True:
 
-    curr_line = next_line
-    next_line = sys.stdin.readline()
-    # next_line = f.readline()
 
+    if input_files:
+        curr_line = next_line
+        next_line = input_file.readline()
+    else:
+        curr_line = next_line
+        next_line = sys.stdin.readline()
+       
 
     if curr_line == '':
-        break
+
+        if input_files:
+            input_file.close()
+            f_ind += 1
+            if f_ind < num_files:
+                input_file = open(input_files[f_ind], 'r')
+            else:
+                break
+        else:
+            break
+            
 
     #----------update process----------
     process.curr_line     = curr_line

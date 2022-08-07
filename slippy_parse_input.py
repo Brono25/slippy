@@ -174,7 +174,7 @@ def parsePatternReplace(sub_input):
 
     patt = patt.strip()
     repl = repl[1:].replace(fr'\{d}', d)
-    flag = flag[1:]
+    flag = flag[1:].strip()
 
 
 

@@ -32,12 +32,12 @@ def processQuit(cmd, process):
     line     = process.curr_line
     line_num = process.curr_line_num
 
+    
     if not cmd.is_address_found: #slippy 'q' quits line 1
         return True
 
     if number:
         if line_num == number:
-
             return True
     elif regex:
         try:
@@ -459,16 +459,20 @@ while True:
             if cmd_info.single_num == r'$':
                 cmd_info.single_num = line_num
             if cmd_info.start_num == r'$':
-                cmd_info.start_num = line_num
+                cmd_info.start_num  = line_num
             if cmd_info.end_num == r'$':
-                cmd_info.end_num = line_num
+                cmd_info.end_num    = line_num
 
         #----------Execute Quit----------
         if cmd_info.operation == 'q':
             process.output_line = process.curr_line
-            if processQuit(cmd_info, process) and process.curr_line != None and not option_n:
-                print(process.output_line, end='')
+            is_quit = processQuit(cmd_info, process)
+
+            if is_quit and process.curr_line != None:
+                if not option_n:
+                    print(process.output_line, end='')
                 sys.exit(0)
+
 
         #----------Execute Print----------
         elif cmd_info.operation == 'p':
@@ -488,8 +492,8 @@ while True:
             cmd_info, process = processDelete(cmd_info, process)
 
             if process.curr_line_status == 'DELETE':
-                process.curr_line = None
-                process.output_line = None
+                process.curr_line        = None
+                process.output_line      = None
                 process.curr_line_status = None
 
 
